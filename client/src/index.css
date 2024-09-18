@@ -1,0 +1,81 @@
+@import url("https://fonts.googleapis.com/css2?family=Lato:wght@400;600&family=Noto+Sans:wght@300;400&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.slick-dots {
+  top: 85%;
+}
+
+.slick-arrow {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+}
+
+.slick-prev,
+.slick-next {
+  background-color: rgb(255, 255, 255) !important;
+  overflow: hidden;
+  z-index: 50;
+  position: absolute;
+  box-shadow: 0px 8px 13px -3px rgba(0, 0, 0, 0.07);
+}
+
+.slick-prev {
+  transform: translate(+0.5rem, -2.5rem);
+}
+.slick-next {
+  transform: translate(-0.5rem, -2.5rem);
+}
+.slick-prev:before {
+  content: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxZW0iIGhlaWdodD0iMWVtIiB2aWV3Qm94PSIwIDAgMTAyNCAxMDI0Ij48cGF0aCBmaWxsPSJjdXJyZW50Q29sb3IiIGQ9Ik02ODUuMjQ4IDEwNC43MDRhNjQgNjQgMCAwIDEgMCA5MC40OTZMMzY4LjQ0OCA1MTJsMzE2LjggMzE2LjhhNjQgNjQgMCAwIDEtOTAuNDk2IDkwLjQ5NkwyMzIuNzA0IDU1Ny4yNDhhNjQgNjQgMCAwIDEgMC05MC40OTZsMzYyLjA0OC0zNjIuMDQ4YTY0IDY0IDAgMCAxIDkwLjQ5NiAwIi8+PC9zdmc+");
+  background-color: transparent;
+  display: block;
+  scale: 2;
+  position: relative;
+  top: -50%;
+  left: -50%;
+  transform: translate(25%, 52.5%);
+}
+
+.slick-next::before {
+  content: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxZW0iIGhlaWdodD0iMWVtIiB2aWV3Qm94PSIwIDAgMTAyNCAxMDI0Ij48cGF0aCBmaWxsPSJjdXJyZW50Q29sb3IiIGQ9Ik0zMzguNzUyIDEwNC43MDRhNjQgNjQgMCAwIDAgMCA5MC40OTZsMzE2LjggMzE2LjhsLTMxNi44IDMxNi44YTY0IDY0IDAgMCAwIDkwLjQ5NiA5MC40OTZsMzYyLjA0OC0zNjIuMDQ4YTY0IDY0IDAgMCAwIDAtOTAuNDk2TDQyOS4yNDggMTA0LjcwNGE2NCA2NCAwIDAgMC05MC40OTYgMCIvPjwvc3ZnPg==");
+  background-color: transparent;
+  /* height: 80%; */
+  display: block;
+  scale: 2;
+  position: relative;
+  top: -50%;
+  left: -50%;
+  transform: translate(25%, 52.5%);
+}
+
+
+.side-image {
+  background: url(./assets/images/big-banner.png);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+}
+.side-image1 {
+  background: url(./assets/images/small-img2.png);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+}
+.side-image2 {
+  background: url(./assets/images/small-img.png);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+}  

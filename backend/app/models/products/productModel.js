@@ -5,15 +5,19 @@ const productSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: "seller",
   },
-  name: {
+  product_name: {
     type: String,
     required: true,
   },
-  description: {
+  product_description: {
     type: String,
     required: true,
   },
-  price: {
+  actual_price: {
+    type: Number,
+    required: true,
+  },
+  offered_price: {
     type: Number,
     required: true,
   },
@@ -21,10 +25,24 @@ const productSchema = new Schema({
     type: Number,
     default: 0,
   },
-  stock: {
+
+  available_stock: {
     type: Number,
     required: true,
   },
+  ordered_stock: {
+    type: Number,
+    default: 0
+  },
+  in_transit_stock: {
+    type: Number,
+    default: 0
+  },
+  delivered_stock: {
+    type: Number,
+    default: 0
+  },
+
   dimensions: {
     length: {
       type: Number,
@@ -62,14 +80,6 @@ const productSchema = new Schema({
     type: [String],
     default: [],
   },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now,
-  },
   variations: {
     category_selection: {
       type: String,
@@ -93,5 +103,6 @@ const productSchema = new Schema({
     model_number: String,
     warranty: String,
   },
-});
+}, { timestamps: true, });
+
 module.exports = mongoose.model("product", productSchema);

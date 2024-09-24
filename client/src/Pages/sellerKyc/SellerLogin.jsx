@@ -10,6 +10,7 @@ import { useDispatch } from "react-redux";
 import toast, { Toaster } from "react-hot-toast";
 import { auth } from "../../redux/features/User/UserSlice";
 import axios from "axios";
+import { setSellerAuth } from "../../redux/features/Seller/SellerSclice";
 
 const SellerLogin = () => {
   // const credentials = {
@@ -18,14 +19,15 @@ const SellerLogin = () => {
   // };
 
   const initialValues = {
-    email_id: "",
     mobile_number: "",
     password: "",
   };
 
   const loginSchema = Yup.object({
-    // name: Yup.string().min(1).required("Please enter your username"),
-    password: Yup.string().min(1).required("Please enter your password"),
+    mobile_number: Yup.string()
+      .matches(/^\d{10}$/, "Mobile number must be 10 digits")
+      .required("A phone number is required"),
+    password: Yup.string().min(8).required("Please enter your password"),
   });
 
   const dispatch = useDispatch();
@@ -38,51 +40,27 @@ const SellerLogin = () => {
 
       onSubmit: async () => {
         try {
-          const res = await axios.post(
-            `${import.meta.env.VITE_BACKEND_URL}/app/seller/sellerLogin`,
-            {
-              mobile_number: values.mobile_number,
-              password: values.password,
-            }
-          );
-
-          console.log(res.data.result);
-          if (res.data.responseCode === 200) {
-            toast.success(res.data.responseMessage);
-            localStorage.setItem("sellerauthToken", res.data.result);
-            // Dispatch to Redux store if needed
-
-            dispatch(auth(true));
-            navigate("/admin");
-          } else {
-            toast.error(res.data.responseMessage);
+          const url = `${import.meta.env.VITE_BACKEND_URL}/seller/sellerLogin`;
+          const response = await axios.post(url, values);
+          // console.log(response);
+          if (response.status === 200) {
+            dispatch(setSellerAuth(true));
+            localStorage.setItem("isAuthorizedSeller", JSON.stringify(true));
+            localStorage.setItem(
+              "sellerAuthToken",
+              JSON.stringify(response.data.authToken)
+            );
+            navigate("/seller/dashboard", { replace: true });
+            window.location.reload();
           }
         } catch (error) {
-          console.log(error);
-          toast.error("An error occurred while trying to log in.");
+          console.error("Error while login");
         }
       },
     });
 
-  const Validation = (username, password) => {
-    const status =
-      username.toLowerCase() === credentials.username &&
-      password === credentials.password;
-
-    console.log("hello");
-
-    dispatch(auth(status));
-
-    if (status) {
-      toast.success("user validated");
-      navigate("/");
-    } else {
-      toast.error("Entered credentials is invalid");
-    }
-  };
-
   const handleCancel = () => {
-    navigate("/");
+    navigate(-1);
   };
 
   useEffect(() => {
@@ -253,16 +231,16 @@ const SellerLogin = () => {
               </div>
             </form>
 
-            <div className="relative">
+            {/* <div className="relative">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-gray-300"></div>
               </div>
               <div className="relative flex justify-center text-sm">
                 <span className="px-2 bg-gray-100">Or Login with</span>
               </div>
-            </div>
+            </div> */}
 
-            <div className="mt-6 grid grid-cols-3 gap-3">
+            {/* <div className="mt-6 grid grid-cols-3 gap-3">
               <div>
                 <a
                   href="#"
@@ -287,11 +265,14 @@ const SellerLogin = () => {
                   <FcGoogle size={"1.5rem"} />
                 </a>
               </div>
-            </div>
+            </div> */}
 
             <p className="text-sm  text-gray-500   font-medium">
               Dont have an account?{" "}
-              <Link to="/sellersignup" className=" text-red-600 hover:underline ">
+              <Link
+                to="/sellersignup"
+                className=" text-red-600 hover:underline "
+              >
                 Sign Up
               </Link>
             </p>

@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  authorized: JSON.parse(localStorage.getItem("user")) ?? false,
+  authorized: JSON.parse(localStorage.getItem("isAuthorizedUser")) ?? false,
 };
 
 export const userSlice = createSlice({
@@ -10,10 +10,14 @@ export const userSlice = createSlice({
   reducers: {
     auth: (state, action) => {
       state.authorized = action.payload;
-      localStorage.setItem("user", JSON.stringify(state.authorized));
     },
   },
 });
+
+export const setAuth = (authState) => (dispatch) => {
+  dispatch(auth(authState));
+  localStorage.setItem("isAuthorizedUser", JSON.stringify(authState));
+};
 
 export const { auth } = userSlice.actions;
 

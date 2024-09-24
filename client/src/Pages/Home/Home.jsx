@@ -10,7 +10,7 @@ import Category from "../../components/Category/Category";
 import TopProduct from "../../components/TopProduct/TopProduct"
 
 const Home = () => {
-  console.log("pipeline working?")
+  // console.log("pipeline working?")
   return (
     <>
       <Hero />

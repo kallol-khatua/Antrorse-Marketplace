@@ -3,13 +3,14 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import { RiArrowDropDownLine } from "react-icons/ri";
 import { CiLogout } from "react-icons/ci";
 import { useDispatch, useSelector } from "react-redux";
-import { auth } from "../../redux/features/User/UserSlice";
+import { setAuth } from "../../redux/features/User/UserSlice";
 import { RxHamburgerMenu } from "react-icons/rx";
 import Antrorse from "../../assets/logo/Antrorse.png";
 import { FaRegHeart } from "react-icons/fa";
 import { FaCartShopping } from "react-icons/fa6";
 import { IoSearch } from "react-icons/io5";
 import { CgProfile } from "react-icons/cg";
+
 const SubMenu = ({ items }) => (
   <ul className="absolute left-0 hidden mt-1 space-y-1 bg-white border rounded-md group-hover:block">
     {items.map((item, index) => (
@@ -25,8 +26,11 @@ const SubMenu = ({ items }) => (
     ))}
   </ul>
 );
+
 const Navbar = () => {
   const isUserLoggedIn = useSelector((state) => state.user.authorized);
+  const isSellerLoggedIn = useSelector((state) => state.seller.authorized);
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -36,7 +40,7 @@ const Navbar = () => {
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const trigger = useRef(null);
   const dropdown = useRef(null);
-  console.log(isUserLoggedIn);
+  // console.log(isUserLoggedIn);
   const mainMenu = [
     {
       path: "/viewproducts",
@@ -63,22 +67,24 @@ const Navbar = () => {
       // ],
     },
     { path: "/trending-products", label: "Trending Products" },
-  //   { path: "/shops", label: "Shops" },
-   ];
+    //   { path: "/shops", label: "Shops" },
+  ];
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
   const handleLogout = () => {
-    // Dispatch the logout action to clear user data
-    dispatch(auth(false));
+    dispatch(setAuth(false));
     navigate("/");
-    // Optionally, you can clear the user data from local storage
-    localStorage.removeItem("user");
+    localStorage.removeItem("isAuthorizedUser");
+    localStorage.removeItem("authToken");
   };
+
   const UserProfileDropdown = () => (
     <div
       ref={dropdown}
-      className={`absolute  mt-40 ml-3 w-32 space-y-2 bg-white border rounded-md ${isProfileDropdownOpen === true ? "block" : "hidden"
-        }`}
+      className={`absolute  mt-40 ml-3 w-32 space-y-2 bg-white border rounded-md ${
+        isProfileDropdownOpen === true ? "block" : "hidden"
+      }`}
     >
       {/* Add menu items for the user profile dropdown */}
       <Link to="/account" className="block px-4 py-1 text-gray-800">
@@ -95,6 +101,7 @@ const Navbar = () => {
       </button>
     </div>
   );
+
   useEffect(() => {
     const clickHandler = ({ target }) => {
       if (!dropdown.current) return;
@@ -109,6 +116,7 @@ const Navbar = () => {
     document.addEventListener("click", clickHandler);
     return () => document.removeEventListener("click", clickHandler);
   });
+
   return (
     <header className="header sticky top-0 bg-white shadow-sm flex items-center justify-between  z-30">
       <section className="relative mx-auto flex flex-1 ">
@@ -118,11 +126,8 @@ const Navbar = () => {
               <img className="h-9 " src={Antrorse} alt="logo" />
             </Link>
             <ul className="hidden lg:flex px-3 mx-auto font-semibold font-heading xl:space-x-12 lg:space-x-8">
-              {mainMenu.map((menuItem) => (
-                <li
-                  key={menuItem.path}
-                  className="relative group py-4 text-nowrap"
-                >
+              {mainMenu.map((menuItem, index) => (
+                <li key={index} className="relative group py-4 text-nowrap">
                   {menuItem.subMenu ? (
                     <>
                       <NavLink to={menuItem.path}>{menuItem.label}</NavLink>
@@ -150,33 +155,29 @@ const Navbar = () => {
               {/* <Link to="/wishlist" className="flex items-center">
                 <FaRegHeart className="text-xl" />
               </Link> */}
-{
-                localStorage.getItem('user') === 'true' ? (
-                  <Link to="/wishlist" className="flex items-center">
-                
-                    <FaRegHeart className="text-xl" />
-                    {wishlistItems.length <= 0 ? (
-                      <span className="flex absolute -mt-5 ml-4">
-                        <span className="animate-ping absolute inline-flex h-3 w-3 rounded-full bg-pink-400 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-3 w-3 bg-pink-500"></span>
-                  
-                      </span>
-                    ) : (
-                      <span className=" flex  items-center justify-center absolute text-xs -mt-6  ml-4 bg-pink-400 rounded-full w-5 h-5 p-2  text-white">
+
+              {isUserLoggedIn ? (
+                <Link to="/wishlist" className="flex items-center">
+                  <FaRegHeart className="text-xl" />
+                  {wishlistItems.length <= 0 ? (
+                    <span className="flex absolute -mt-5 ml-4">
+                      <span className="animate-ping absolute inline-flex h-3 w-3 rounded-full bg-pink-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-3 w-3 bg-pink-500"></span>
+                    </span>
+                  ) : (
+                    <span className=" flex  items-center justify-center absolute text-xs -mt-6  ml-4 bg-pink-400 rounded-full w-5 h-5 p-2  text-white">
                       {console.log("wishlistItems.length", wishlistItems)}
-                        {wishlistItems.length}
-                      </span>
-                    )}
-                  </Link>
-                ) : (
-                  <Link to="/login" className="flex items-center">
-                   
-                    <FaRegHeart className="text-xl" />
-                  </Link>
-                )
-              }
+                      {wishlistItems.length}
+                    </span>
+                  )}
+                </Link>
+              ) : (
+                <Link to="/login" className="flex items-center">
+                  <FaRegHeart className="text-xl" />
+                </Link>
+              )}
               <div>
-              {/* <Link to="/viewcart" className="flex items-center mr-2">
+                {/* <Link to="/viewcart" className="flex items-center mr-2">
                   <FaCartShopping className="text-xl" />
                   {cartItems.length <= 0 ? (
                     <span className="flex absolute -mt-5 ml-4">
@@ -189,11 +190,9 @@ const Navbar = () => {
                     </span>
                   )}
                 </Link> */}
-              {localStorage.getItem('user')=='true'?(
-                    <Link to="/viewcart" className="flex items-center">
-                
-                   
-                <FaCartShopping className="text-xl" />
+                {isUserLoggedIn ? (
+                  <Link to="/viewcart" className="flex items-center">
+                    <FaCartShopping className="text-xl" />
                     {cartItems.length <= 0 ? (
                       <span className="flex absolute -mt-5 ml-4">
                         <span className="animate-ping absolute inline-flex h-3 w-3 rounded-full bg-pink-400 opacity-75"></span>
@@ -204,17 +203,14 @@ const Navbar = () => {
                         {cartItems.length}
                       </span>
                     )}
-   
                   </Link>
-                ):(
+                ) : (
                   <Link to="/login" className="flex items-center">
-                 
-                  <FaCartShopping className="text-xl" />
-                </Link>
-                )
-                }
-              
+                    <FaCartShopping className="text-xl" />
+                  </Link>
+                )}
               </div>
+
               {/* userProfile or login */}
               <div className="hidden lg:flex items-center justify-center gap-2">
                 {isUserLoggedIn ? (
@@ -250,15 +246,28 @@ const Navbar = () => {
                     login
                   </Link>
                 )}
-                <Link
-                  to="/sellersignup"
-                  className="flex justify-center text-black px-4 py-1 rounded-sm border border-black"
-                  onClick={() => {
-                    toggleMenu(); // Close the menu when clicked
-                  }}
-                >
-                  Sell with us
-                </Link>
+
+                {isSellerLoggedIn ? (
+                  <a
+                    href="/seller/dashboard"
+                    className="flex justify-center text-black px-4 py-1 rounded-sm border border-black"
+                    onClick={() => {
+                      toggleMenu(); // Close the menu when clicked
+                    }}
+                  >
+                    Go to Dashboard
+                  </a>
+                ) : (
+                  <Link
+                    to="/sellersignup"
+                    className="flex justify-center text-black px-4 py-1 rounded-sm border border-black"
+                    onClick={() => {
+                      toggleMenu(); // Close the menu when clicked
+                    }}
+                  >
+                    Sell with us
+                  </Link>
+                )}
               </div>
               <a
                 className="lg:hidden flex text-xl font-semibold mr-6 items-center"
@@ -284,7 +293,9 @@ const Navbar = () => {
                 </Link>
               </li>
               <li className="relative group">
-                <Link to="/viewproducts" onClick={toggleMenu}>Devi Products</Link>
+                <Link to="/viewproducts" onClick={toggleMenu}>
+                  Devi Products
+                </Link>
                 {/* <ul
                   className="absolute hidden mt-2 space-y-2 bg-white border rounded-md group-hover:block z-10"
                   style={{ width: "185px" }}
@@ -323,7 +334,9 @@ const Navbar = () => {
                 {/* <span className="ml-1 text-gray-500">&#9662;</span> */}
               </li>
               <li className="relative group">
-                <Link to="/viewproducts" onClick={toggleMenu}>Shop</Link>
+                <Link to="/viewproducts" onClick={toggleMenu}>
+                  Shop
+                </Link>
                 {/* <ul
                   className="absolute hidden mt-2 space-y-2 bg-white border rounded-md group-hover:block"
                   style={{ width: "180px" }}
@@ -362,7 +375,9 @@ const Navbar = () => {
                 {/* <span className="ml-1 text-gray-500">&#9662;</span> */}
               </li>
               <li>
-                <Link to="/trending-products" onClick={toggleMenu}>Trending Products</Link>
+                <Link to="/trending-products" onClick={toggleMenu}>
+                  Trending Products
+                </Link>
               </li>
               <li>
                 <div className="flex items-center gap-2">

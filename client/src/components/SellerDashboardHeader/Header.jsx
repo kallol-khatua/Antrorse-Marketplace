@@ -86,7 +86,7 @@ const Header = () => {
         <div className="flex items-center gap-3 2xsm:gap-7">
           <ul className="flex items-center gap-2 2xsm:gap-4">
             {/* <!-- Chat Notification Area --> */}
-            <DropdownMessage />
+            {/* <DropdownMessage /> */}
             {/* <!-- Chat Notification Area --> */}
           </ul>
 

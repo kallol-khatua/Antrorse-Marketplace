@@ -271,10 +271,10 @@ const SellerAccount = () => {
           </div>
           <hr className="mt-4 mb-8" />
 
-          <div className="mb-10 flex justify-center">
+          {/* Add functionality for deleting account */}
+          {/* <div className="mb-10 flex justify-center">
             <p className="py-2 text-xl font-semibold">Delete Account</p>
-            {/* Add functionality for deleting account */}
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

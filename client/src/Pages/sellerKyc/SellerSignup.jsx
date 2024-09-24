@@ -3,142 +3,81 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
+import { useDispatch } from "react-redux";
+import { setSellerAuth } from "../../redux/features/Seller/SellerSclice";
 
 const SellerSignUp = () => {
-  const [otp, setOtp] = useState("");
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [isKycPopupVisible, setIsKycPopupVisible] = useState(false);
-  const [otpType, setOtpType] = useState("mobile");
-  const [resendTimer, setResendTimer] = useState(30);
-  const [isResendDisabled, setIsResendDisabled] = useState(false);
   const navigate = useNavigate();
-  const location = useLocation();
-  const { userData } = location.state || {};
-
+  const dispatch = useDispatch();
   // Define initial form values
   const initialValues = {
     name: "",
     email: "",
-    countryCode: "+91",
-    mobile: "",
-    gstNumber: "",
+    password: "",
+    confirmPassword: "",
+    mobile_number: "",
+    isAcceptTermsAndConditions: true,
+    gst_number: "",
+    company_name: "",
   };
 
   // Define form validation schema
   const signUpSchema = Yup.object({
-    name: Yup.string().min(3).required("Please enter your username"),
-    email: Yup.string().email().required("Please enter your email"),
-    countryCode: Yup.string().required("Please select a country code"),
-    mobile: Yup.string()
+    name: Yup.string()
+      .min(3, "Name must be at least 3 characters")
+      .required("Please enter your name"),
+    email: Yup.string().email().required("Please enter your email address"),
+    password: Yup.string()
+      .min(8, "Password must be at least 8 characters")
+      .required("Please enter password"),
+    confirmPassword: Yup.string()
+      .min(8, "confirm password must be at least 8 characters")
+      .required("Please enter confirm password"),
+    mobile_number: Yup.string()
       .matches(/^\d{10}$/, "Mobile number must be 10 digits")
       .required("A phone number is required"),
-    gstNumber: Yup.string().required("Please enter your company GST number"),
+    isAcceptTermsAndConditions: Yup.boolean().required(
+      "Please accept Terms and Conditions"
+    ),
+    gst_number: Yup.string()
+      .min(15, "GST number must be at least 15 characters")
+      .max(15, "GST number must be at most 15 characters")
+      .required("Please enter your company GST number"),
+    company_name: Yup.string()
+      .min(3, "Company name must be at least 3 characters")
+      .required("Please enter your company name"),
   });
 
-  const headers = {
-    "Content-Type": "application/json",
-  };
   // Initialize formik for form handling
   const { values, errors, touched, handleBlur, handleChange, handleSubmit } =
     useFormik({
       initialValues: initialValues,
       validationSchema: signUpSchema,
       onSubmit: async () => {
+        // console.log(values);
         try {
-          const response = await axios.post(
-            `${
-              import.meta.env.VITE_BACKEND_URL
-            }/app/seller/sendOtpForRegistration`,
-            {
-              fullName: values.name,
-              email_id: values.email,
-              mobile_number: values.mobile,
-              GST: values.gstNumber,
-            },
-            { headers }
-          );
+          const url = `${
+            import.meta.env.VITE_BACKEND_URL
+          }/seller/sellerRegistration`;
+          const response = await axios.post(url, values);
 
-          const generatedOtp = response.data.otp;
+          if (response.status === 201) {
+            // console.log(response);
+            // console.log(response.data);
+            dispatch(setSellerAuth(true));
+            localStorage.setItem("isAuthorizedSeller", JSON.stringify(true));
+            localStorage.setItem(
+              "sellerAuthToken",
+              JSON.stringify(response.data.authToken)
+            );
 
-          setIsSubmitted(true);
-          setOtp(generatedOtp);
+            navigate("/");
+          }
         } catch (error) {
-          console.error("Error sending data to generate OTP:", error);
+          console.error("Error while creating new seller account");
         }
       },
     });
-
-  const showKycPopup = () => {
-    setIsKycPopupVisible(true);
-  };
-
-  const handleVerify = async () => {
-    try {
-      const verificationResponse = await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/app/seller/sellerRegistration`,
-        {
-          mobile_number: values.mobile,
-          fullName: values.name,
-          email_id: values.email,
-          GST: values.gstNumber,
-        },
-        { headers }
-      );
-
-      if (verificationResponse.data.success) {
-        setIsSubmitted(false);
-        showKycPopup();
-      } else {
-        alert("Your account has been created successfully..");
-        // navigate("/sellercreatepassword", { state: { userData, mobile: values.mobile } });
-        // navigate("/sellercreatepassword", { state: { userData, mobile: values.mobile } });
-        navigate("/sellercreatepassword", {
-          state: { userData, mobile: values.mobile },
-        });
-      }
-    } catch (error) {
-      console.error("Error verifying OTP:", error);
-    }
-  };
-
-  const handleResendOtp = async () => {
-    try {
-      await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/app/seller/resendOtp`,
-        {
-          otpType: "mobile",
-          mobile: values.mobile,
-          email: values.email,
-        },
-        { headers }
-      );
-
-      setIsResendDisabled(true);
-      setResendTimer(30);
-    } catch (error) {
-      console.error("Error resending OTP:", error);
-    }
-  };
-
-  useEffect(() => {
-    let timer;
-
-    if (isResendDisabled) {
-      timer = setInterval(() => {
-        setResendTimer((prevTimer) => prevTimer - 1);
-      }, 1000);
-    }
-
-    return () => {
-      clearInterval(timer);
-    };
-  }, [isResendDisabled]);
-
-  useEffect(() => {
-    if (resendTimer === 0) {
-      setIsResendDisabled(false);
-    }
-  }, [resendTimer]);
 
   return (
     <div className="flex flex-col">
@@ -149,219 +88,241 @@ const SellerSignUp = () => {
               <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl">
                 Register as a Seller
               </h1>
-
-              {isSubmitted ? (
-                <form className="space-y-2 md:space-y-4">
-                  <div className="flex flex-col gap-1">
-                    <label
-                      htmlFor="otp"
-                      className="text-sm font-medium text-gray-900"
-                    >
-                      Enter OTP sent to your{" "}
-                      {otpType === "mobile" ? "mobile" : "email"}
-                    </label>
-                    <input
-                      type="text"
-                      id="otp"
-                      className="bg-gray-50 border text-gray-900 sm:text-sm rounded-md focus:ring-2 focus:outline-none focus:ring-slate-600 block w-full p-2.5"
-                      value={otp}
-                      onChange={(e) => setOtp(e.target.value)}
-                    />
-                  </div>
-
-                  <div className="">
-                    <button
-                      type="button"
-                      className="text-sm text-blue-500 cursor-pointer hover:underline "
-                      onClick={() =>
-                        setOtpType(otpType === "mobile" ? "email" : "mobile")
-                      }
-                    >
-                      Send OTP to {otpType === "mobile" ? "Email" : "Mobile"}
-                    </button>
-
-                    <div className=" mt-4 md:items-center md:justify-between space-y-4 md:space-y-0 md:space-x-2">
-                      <button
-                        type="button"
-                        onClick={handleVerify}
-                        className="w-full  text-slate-200 bg-red-500 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-md text-sm px-5 py-2.5 text-center mt-4 md:mt-0 "
-                      >
-                        Verify OTP
-                      </button>
-                      <button
-                        type="button"
-                        onClick={handleResendOtp}
-                        disabled={isResendDisabled}
-                        className={`w-full py-2.5 px-5 text-sm mt-24 ${
-                          isResendDisabled ? "text-gray-500" : "text-blue-500"
-                        } cursor-pointer hover:underline`}
-                      >
-                        {isResendDisabled
-                          ? `Resend OTP in ${resendTimer}s`
-                          : "Resend OTP"}
-                      </button>
-                    </div>
-                  </div>
-                </form>
-              ) : (
-                <form
-                  className="space-y-4 md:space-y-6"
-                  action="#"
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    handleSubmit();
-                  }}
-                >
-                  <div className="flex flex-col gap-1">
-                    <label
-                      htmlFor="text"
-                      className="text-sm font-medium text-gray-900"
-                    >
-                      Name
-                    </label>
-                    <input
-                      type="text"
-                      name="name"
-                      id="text"
-                      className="bg-gray-50 border text-gray-900 sm:text-sm rounded-md focus:ring-2 focus:outline-none focus:ring-slate-600 block w-full p-2.5"
-                      placeholder="John Doe"
-                      value={values.name}
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                    />
-                    {errors.name && touched.name ? (
-                      <p className="text-red-600 text-[0.75rem] capitalize">
-                        {errors.name}
-                      </p>
-                    ) : null}
-                  </div>
-
-                  <div className="flex flex-col gap-1">
-                    <label
-                      htmlFor="mobile"
-                      className="text-sm font-medium text-gray-900"
-                    >
-                      Mobile Number
-                    </label>
-                    <div className="flex items-center">
-                      <select
-                        name="countryCode"
-                        id="countryCode"
-                        className="bg-gray-50 border text-gray-900 sm:text-sm rounded-md focus:ring-2 focus:outline-none focus:ring-slate-600 p-2.5"
-                        value={values.countryCode}
-                        onChange={handleChange}
-                      >
-                        <option value="+91">+91</option>
-                        {/* Add more country codes as needed */}
-                      </select>
-                      <input
-                        type="text"
-                        name="mobile"
-                        id="mobile"
-                        className="bg-gray-50 border w-full text-gray-900 sm:text-sm rounded-md focus:ring-2 focus:outline-none focus:ring-slate-600 p-2.5 ml-2"
-                        placeholder="1234567890"
-                        value={values.mobile}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                      />
-                    </div>
-                    {errors.mobile && touched.mobile ? (
-                      <p className="text-red-600 text-[0.75rem] capitalize">
-                        {errors.mobile}
-                      </p>
-                    ) : null}
-                  </div>
-
-                  <div className="flex flex-col gap-1">
-                    <label
-                      htmlFor="email"
-                      className="text-sm font-medium text-gray-900"
-                    >
-                      Email ID
-                    </label>
-                    <input
-                      type="email"
-                      name="email"
-                      id="email"
-                      className="bg-gray-50 border text-gray-900 sm:text-sm rounded-md focus:ring-2 focus:outline-none focus:ring-slate-600 block w-full p-2.5"
-                      placeholder="name@company.com"
-                      value={values.email}
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                    />
-                    {errors.email && touched.email ? (
-                      <p className="text-red-600 text-[0.75rem] capitalize">
-                        {errors.email}
-                      </p>
-                    ) : null}
-                  </div>
-
-                  <div className="flex flex-col gap-1">
-                    <label
-                      htmlFor="gstNumber"
-                      className="text-sm font-medium text-gray-900"
-                    >
-                      GSTIN (Goods and Services Tax Identification Number)
-                    </label>
-                    <input
-                      type="text"
-                      name="gstNumber"
-                      id="gstNumber"
-                      className="bg-gray-50 border text-gray-900 sm:text-sm rounded-md focus:ring-2 focus:outline-none focus:ring-slate-600 block w-full p-2.5"
-                      placeholder="Enter your company GST number"
-                      value={values.gstNumber}
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                    />
-                    {errors.gstNumber && touched.gstNumber ? (
-                      <p className="text-red-600 text-[0.75rem] capitalize">
-                        {errors.gstNumber}
-                      </p>
-                    ) : null}
-                  </div>
-
-                  <div className="flex space-x-2">
-                    <button
-                      type="submit"
-                      className="w-full text-slate-200 bg-red-500 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-md text-sm px-5 py-2.5 text-center mt-4"
-                    >
-                      Submit
-                    </button>
-
-                    {/* Cancel Button */}
-                    <button
-                      type="button"
-                      onClick={() => navigate("/sellerlogin")}
-                      className="w-full text-gray-600 border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-md text-sm px-5 py-2.5 text-center mt-4"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </form>
-              )}
-
-              {/* {isSubmitted && (
-                <div className={`popup ${isKycPopupVisible ? "visible" : ""}`}>
-                  <div className="popup-content">
-                    <p className="py-2 px-2">
-                      Verification successfully! You can now proceed. However,
-                      KYC is pending. Please complete your KYC before
-                      proceeding.
+              <form
+                className="space-y-4 md:space-y-6"
+                action="#"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleSubmit();
+                }}
+              >
+                <div className="flex flex-col gap-1">
+                  <label
+                    htmlFor="text"
+                    className="text-sm font-medium text-gray-900"
+                  >
+                    Name (Required)
+                  </label>
+                  <input
+                    type="text"
+                    name="name"
+                    id="text"
+                    className="bg-gray-50 border text-gray-900 sm:text-sm rounded-md focus:ring-2 focus:outline-none focus:ring-slate-600 block w-full p-2.5"
+                    placeholder="John Doe"
+                    value={values.name}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                  />
+                  {errors.name && touched.name ? (
+                    <p className="text-red-600 text-[0.75rem] capitalize">
+                      {errors.name}
                     </p>
-                    <Link
-                      to="/kycform"
-                      className={`bg-blue-500 text-white py-2 px-4 rounded mt-4 ${
-                        window.location.pathname === "/kycform"
-                          ? "bg-blue-700"
-                          : ""
-                      }`}
-                      onClick={closeKycPopup}
+                  ) : null}
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <label
+                    htmlFor="mobile_number"
+                    className="text-sm font-medium text-gray-900"
+                  >
+                    Mobile Number (Required)
+                  </label>
+                  <div className="flex items-center w-full">
+                    <select
+                      name="countryCode"
+                      id="countryCode"
+                      className="bg-gray-50 border text-gray-900 sm:text-sm rounded-md focus:ring-2 focus:outline-none focus:ring-slate-600 p-2.5"
+                      value={values.countryCode}
+                      onChange={handleChange}
                     >
-                      Go to KYC Page
-                    </Link>
+                      <option value="+91">+91</option>
+                      {/* Add more country codes as needed */}
+                    </select>
+                    <input
+                      type="text"
+                      name="mobile_number"
+                      id="mobile_number"
+                      className="bg-gray-50 border text-gray-900 sm:text-sm rounded-md focus:ring-2 focus:outline-none focus:ring-slate-600 p-2.5 ml-2 flex flex-1"
+                      placeholder="1234567890"
+                      value={values.mobile_number}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                    />
+                  </div>
+                  {errors.mobile_number && touched.mobile_number ? (
+                    <p className="text-red-600 text-[0.75rem] capitalize">
+                      {errors.mobile_number}
+                    </p>
+                  ) : null}
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <label
+                    htmlFor="email"
+                    className="text-sm font-medium text-gray-900"
+                  >
+                    Email ID (Required)
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    id="email"
+                    className="bg-gray-50 border text-gray-900 sm:text-sm rounded-md focus:ring-2 focus:outline-none focus:ring-slate-600 block w-full p-2.5"
+                    placeholder="name@company.com "
+                    value={values.email}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                  />
+                  {errors.email && touched.email && (
+                    <p className="text-red-600 text-[0.75rem] capitalize">
+                      {errors.email}
+                    </p>
+                  )}
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <label
+                    htmlFor="password"
+                    className=" text-sm font-medium text-gray-900 "
+                  >
+                    Password (Required)
+                  </label>
+                  <input
+                    type="password"
+                    name="password"
+                    id="password"
+                    placeholder="••••••••"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-md focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5  "
+                    value={values.password}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                  />
+                  {errors.password && touched.password && (
+                    <p className="text-red-600 text-[0.75rem] capitalize">
+                      {errors.password}
+                    </p>
+                  )}
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <label
+                    htmlFor="confirmPassword"
+                    className=" text-sm font-medium text-gray-900 "
+                  >
+                    Confirm password (Required)
+                  </label>
+                  <input
+                    type="password"
+                    name="confirmPassword"
+                    id="confirmPassword"
+                    placeholder="••••••••"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-md focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5  "
+                    value={values.confirmPassword}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                  />
+                  {errors.confirmPassword && touched.confirmPassword && (
+                    <p className="text-red-600 text-[0.75rem] capitalize">
+                      {errors.confirmPassword}
+                    </p>
+                  )}
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <label
+                    htmlFor="company_name"
+                    className="text-sm font-medium text-gray-900"
+                  >
+                    Company name (Required)
+                  </label>
+                  <input
+                    type="text"
+                    name="company_name"
+                    id="company_name"
+                    className="bg-gray-50 border text-gray-900 sm:text-sm rounded-md focus:ring-2 focus:outline-none focus:ring-slate-600 block w-full p-2.5"
+                    placeholder="Enter your company name"
+                    value={values.company_name}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                  />
+                  {errors.company_name && touched.company_name && (
+                    <p className="text-red-600 text-[0.75rem] capitalize">
+                      {errors.company_name}
+                    </p>
+                  )}
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <label
+                    htmlFor="gst_number"
+                    className="text-sm font-medium text-gray-900"
+                  >
+                    GSTIN (Required)
+                  </label>
+                  <input
+                    type="text"
+                    name="gst_number"
+                    id="gst_number"
+                    className="bg-gray-50 border text-gray-900 sm:text-sm rounded-md focus:ring-2 focus:outline-none focus:ring-slate-600 block w-full p-2.5"
+                    placeholder="Enter your company GST number"
+                    value={values.gst_number}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                  />
+                  {errors.gst_number && touched.gst_number && (
+                    <p className="text-red-600 text-[0.75rem] capitalize">
+                      {errors.gst_number}
+                    </p>
+                  )}
+                </div>
+
+                <div className="flex items-start">
+                  <div className="flex items-center h-5">
+                    <input
+                      id="isAcceptTermsAndConditions"
+                      aria-describedby="isAcceptTermsAndConditions"
+                      type="checkbox"
+                      className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 accent-red-500"
+                      value={values.isAcceptTermsAndConditions}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      required
+                    />
+                  </div>
+                  <div className="ml-3 text-sm">
+                    <label
+                      htmlFor="isAcceptTermsAndConditions"
+                      className="font-light text-gray-500"
+                    >
+                      I accept the{" "}
+                      <Link
+                        className="font-medium text-red-600 hover:underline"
+                        to="/terms-and-conditions"
+                      >
+                        Terms and Conditions
+                      </Link>
+                    </label>
                   </div>
                 </div>
-              )} */}
+
+                <div className="flex space-x-2">
+                  <button
+                    type="submit"
+                    className="w-full text-slate-200 bg-red-500 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-md text-sm px-5 py-2.5 text-center mt-4"
+                  >
+                    Create an Account
+                  </button>
+
+                  {/* Cancel Button */}
+                  <button
+                    type="button"
+                    onClick={() => navigate("/sellerlogin")}
+                    className="w-full text-gray-600 border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-md text-sm px-5 py-2.5 text-center mt-4"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
 
               <p className="text-sm text-gray-500 font-medium">
                 Already have an account?{" "}

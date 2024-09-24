@@ -1,16 +1,10 @@
 require("dotenv").config()
 const mongoose = require('mongoose');
 
-
-mongoose.connect(process.env.DB_URL, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
-
-/******************************** Events of mongoose connection. ******************************************************/
+mongoose.connect(process.env.DB_URL);
 
 mongoose.connection.on('connected', () => {
-  console.log('Mongoose default connection open to ' );
+  console.log('Mongoose default connection open to ');
 });
 
 mongoose.connection.on('error', (err) => {

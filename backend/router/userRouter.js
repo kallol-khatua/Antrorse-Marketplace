@@ -4,7 +4,7 @@ const userController= require("../app/controlllers/userController")
 const wishlistController= require("../app/controlllers/wishListController")
 const auth=require("../app/middleware/auth")
 
-router.post("/registration", userController.register)
+router.post("/register", userController.register)
 router.post("/sendOtpForRegistration",userController.sendOtpForRegistration)
 router.post("/login", userController.login)
 router.post("/loginWithOTP", userController.loginWithOTP)

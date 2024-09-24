@@ -1,25 +1,38 @@
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
 import * as Yup from "yup";
 import { useFormik } from "formik";
 import { Link, useNavigate } from "react-router-dom";
-import { FaFacebook } from "react-icons/fa";
-import { FaXTwitter } from "react-icons/fa6";
-import { FcGoogle } from "react-icons/fc";
-import OTP from "./OTP";
+// import { FaFacebook } from "react-icons/fa";
+// import { FaXTwitter } from "react-icons/fa6";
+// import { FcGoogle } from "react-icons/fc";
+
+import axios from "axios";
+import { useDispatch } from "react-redux";
+import { setAuth } from "../../redux/features/User/UserSlice";
 
 const SignUp = () => {
+  const dispatch = useDispatch();
+
   const initialValues = {
     name: "",
-    mobile: "",
+    mobile_number: "",
     email: "",
+    password: "",
+    confirmPassword: "",
+    isAcceptTermsAndConditions: false,
   };
 
   const signUpSchema = Yup.object({
-    name: Yup.string().min(3).required("Please enter your username"),
-    mobile: Yup.string()
+    name: Yup.string().min(3).required("Please enter your name"),
+    mobile_number: Yup.string()
       .matches(/^\d{10}$/, "Mobile number must be 10 digits")
       .required("A phone number is required"),
-    email: Yup.string().email().required("Please enter your email"),
+    // email: Yup.string().email().required("Please enter your email"),
+    password: Yup.string().min(8).required("Please enter password"),
+    confirmPassword: Yup.string()
+      .min(8)
+      .required("Please enter confirm password"),
+    isAcceptTermsAndConditions: Yup.boolean().required("Please accept Terms and Conditions"),
   });
 
   const navigate = useNavigate();
@@ -30,50 +43,38 @@ const SignUp = () => {
       initialValues: initialValues,
       validationSchema: signUpSchema,
       onSubmit: async (values) => {
+        // console.log(values);
         try {
-          const response = await fetch(
-            `${
-              import.meta.env.VITE_BACKEND_URL
-            }/app/user/sendOtpForRegistration`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                user_name: values.name,
-                email: values.email,
-                mobile_number: values.mobile,
-              }),
-            }
-          );
+          const url = `${import.meta.env.VITE_BACKEND_URL}/user/register`;
+          const response = await axios.post(url, values);
 
-          if (response.ok) {
-            const responseData = await response.json();
-
-            if (responseData.responseCode === 409) {
-              // Set error message for existing user
-              setErrorMessage(responseData.responseMessage);
-            } else {
-              // Clear error message
-              setErrorMessage("");
-
-              // Redirect to OTP page if OTP is successfully sent
-              navigate("/otp", { state: { userData: values } });
-            }
-          } else {
-            // Handle the case where OTP sending failed
-            console.error("Failed to send OTP");
+          if (response.status === 201) {
+            // console.log(response);
+            // console.log(response.data);
+            dispatch(setAuth(true));
+            localStorage.setItem("isAuthorizedUser", JSON.stringify(true));
+            localStorage.setItem(
+              "authToken",
+              JSON.stringify(response.data.authToken)
+            );
+            navigate(-1);
           }
         } catch (error) {
-          console.error("Error sending OTP:", error);
+          console.error("Error while creating account");
         }
       },
     });
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+  }, []);
+
+  const goToLoginPage = () => {
+    navigate("/login", { replace: true });
+  };
+
   const handleCancel = () => {
-    // Redirect to the home page
-    navigate("/");
+    navigate(-1);
   };
 
   return (
@@ -96,7 +97,7 @@ const SignUp = () => {
                     htmlFor="text"
                     className="text-sm font-medium text-gray-900"
                   >
-                    Name
+                    Name (Required)
                   </label>
                   <input
                     type="text"
@@ -117,10 +118,10 @@ const SignUp = () => {
 
                 <div className="flex flex-col gap-1">
                   <label
-                    htmlFor="mobile"
+                    htmlFor="mobile_number"
                     className="text-sm font-medium text-gray-900"
                   >
-                    Mobile Number
+                    Mobile Number (Required)
                   </label>
                   <div className="flex items-center w-full">
                     <select
@@ -135,18 +136,18 @@ const SignUp = () => {
                     </select>
                     <input
                       type="text"
-                      name="mobile"
-                      id="mobile"
+                      name="mobile_number"
+                      id="mobile_number"
                       className="bg-gray-50 border text-gray-900 sm:text-sm rounded-md focus:ring-2 focus:outline-none focus:ring-slate-600 p-2.5 ml-2 flex flex-1"
                       placeholder="1234567890"
-                      value={values.mobile}
+                      value={values.mobile_number}
                       onChange={handleChange}
                       onBlur={handleBlur}
                     />
                   </div>
-                  {errors.mobile && touched.mobile ? (
+                  {errors.mobile_number && touched.mobile_number ? (
                     <p className="text-red-600 text-[0.75rem] capitalize">
-                      {errors.mobile}
+                      {errors.mobile_number}
                     </p>
                   ) : null}
                 </div>
@@ -156,7 +157,7 @@ const SignUp = () => {
                     htmlFor="email"
                     className="text-sm font-medium text-gray-900"
                   >
-                    Email ID
+                    Email ID (Optional)
                   </label>
                   <input
                     type="email"
@@ -168,32 +169,86 @@ const SignUp = () => {
                     onChange={handleChange}
                     onBlur={handleBlur}
                   />
-                  {errors.email && touched.email ? (
+                  {errors.email && touched.email && (
                     <p className="text-red-600 text-[0.75rem] capitalize">
                       {errors.email}
                     </p>
-                  ) : null}
+                  )}
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <label
+                    htmlFor="password"
+                    className=" text-sm font-medium text-gray-900 "
+                  >
+                    Password (Required)
+                  </label>
+                  <input
+                    type="password"
+                    name="password"
+                    id="password"
+                    placeholder="••••••••"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-md focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5  "
+                    value={values.password}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                  />
+                  {errors.password && touched.password && (
+                    <p className="text-red-600 text-[0.75rem] capitalize">
+                      {errors.password}
+                    </p>
+                  )}
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <label
+                    htmlFor="confirmPassword"
+                    className=" text-sm font-medium text-gray-900 "
+                  >
+                    Confirm password (Required)
+                  </label>
+                  <input
+                    type="password"
+                    name="confirmPassword"
+                    id="confirmPassword"
+                    placeholder="••••••••"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-md focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5  "
+                    value={values.confirmPassword}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                  />
+                  {errors.confirmPassword && touched.confirmPassword && (
+                    <p className="text-red-600 text-[0.75rem] capitalize">
+                      {errors.confirmPassword}
+                    </p>
+                  )}
                 </div>
 
                 <div className="flex items-start">
                   <div className="flex items-center h-5">
                     <input
-                      id="terms"
-                      aria-describedby="terms"
+                      id="isAcceptTermsAndConditions"
+                      aria-describedby="isAcceptTermsAndConditions"
                       type="checkbox"
                       className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 accent-red-500"
+                      value={values.isAcceptTermsAndConditions}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
                       required
                     />
                   </div>
                   <div className="ml-3 text-sm">
-                    <label htmlFor="terms" className="font-light text-gray-500">
+                    <label
+                      htmlFor="isAcceptTermsAndConditions"
+                      className="font-light text-gray-500"
+                    >
                       I accept the{" "}
-                      <a
+                      <Link
                         className="font-medium text-red-600 hover:underline"
-                        href="#"
+                        to="/terms-and-conditions"
                       >
                         Terms and Conditions
-                      </a>
+                      </Link>
                     </label>
                   </div>
                 </div>
@@ -201,7 +256,7 @@ const SignUp = () => {
                 <div className="flex space-x-2">
                   <button
                     type="submit"
-                    className="w-full text-slate-200 bg-red-500 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-md text-sm px-5 py-2.5 text-center mt-4"
+                    className="w-full text-slate-200 bg-red-500 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-md text-sm px-5 py-2.5 text-center mt-2"
                   >
                     Create an Account
                   </button>
@@ -209,21 +264,19 @@ const SignUp = () => {
                   {/* Cancel Button */}
                   <button
                     type="button"
-                    onClick={() => navigate("/login")}
-                    className="w-full text-gray-600 border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-md text-sm px-5 py-2.5 text-center mt-4"
+                    onClick={handleCancel}
+                    className="w-full text-gray-600 border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-md text-sm px-5 py-2.5 text-center mt-2"
                   >
                     Cancel
                   </button>
                 </div>
 
                 {errorMessage && (
-                  <p className="text-red-600 text-[0.75rem] mt-2">
-                    {errorMessage}
-                  </p>
+                  <p className="text-red-600 text-[0.75rem]">{errorMessage}</p>
                 )}
               </form>
 
-              <div className="mt-6 grid grid-cols-3 gap-3">
+              {/* <div className="mt-6 grid grid-cols-3 gap-3">
                 <div>
                   <a
                     href="#"
@@ -248,13 +301,16 @@ const SignUp = () => {
                     <FcGoogle size={"1.5rem"} />
                   </a>
                 </div>
-              </div>
+              </div> */}
 
               <p className="text-sm text-gray-500 font-medium">
                 Already have an account?{" "}
-                <Link to="/login" className="text-red-600 hover:underline">
+                <span
+                  onClickCapture={goToLoginPage}
+                  className=" text-red-600 hover:underline cursor-pointer"
+                >
                   Login here
-                </Link>
+                </span>
               </p>
             </div>
           </div>

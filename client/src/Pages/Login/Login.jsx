@@ -10,6 +10,7 @@ import { useDispatch } from "react-redux";
 import toast, { Toaster } from "react-hot-toast";
 import { auth } from "../../redux/features/User/UserSlice";
 import axios from "axios";
+import { setAuth } from "../../redux/features/User/UserSlice";
 
 const Login = () => {
   // const credentials = {
@@ -18,14 +19,15 @@ const Login = () => {
   // };
 
   const initialValues = {
-    email_id: "",
     mobile_number: "",
     password: "",
   };
 
   const loginSchema = Yup.object({
-    // name: Yup.string().min(1).required("Please enter your username"),
-    password: Yup.string().min(1).required("Please enter your password"),
+      mobile_number: Yup.string()
+        .matches(/^\d{10}$/, "Mobile number must be 10 digits")
+        .required("A phone number is required"),
+      password: Yup.string().min(8).required("Please enter your password"),
   });
 
   const dispatch = useDispatch();
@@ -38,56 +40,35 @@ const Login = () => {
 
       onSubmit: async () => {
         try {
-          const res = await axios.post(
-            `${import.meta.env.VITE_BACKEND_URL}/app/user/login`,
-            {
-              mobile_number: values.mobile_number,
-              password: values.password,
-            }
-          );
+          const url = `${import.meta.env.VITE_BACKEND_URL}/user/login`;
+          const response = await axios.post(url, values);
 
-          console.log(res.data.result);
-          if (res.data.responseCode === 200) {
-            toast.success(res.data.responseMessage);
-            localStorage.setItem("authToken", res.data.result);
-            // Dispatch to Redux store if needed
-
-            dispatch(auth(true));
-            navigate("/");
-          } else {
-            toast.error(res.data.responseMessage);
+          if (response.status === 200) {
+            dispatch(setAuth(true));
+            localStorage.setItem("isAuthorizedUser", JSON.stringify(true));
+            localStorage.setItem(
+              "authToken",
+              JSON.stringify(response.data.authToken)
+            );
+            navigate(-1);
           }
         } catch (error) {
-          console.log(error);
-          toast.error("An error occurred while trying to log in.");
+          console.error("Error while login");
         }
       },
     });
 
-  const Validation = (username, password) => {
-    const status =
-      username.toLowerCase() === credentials.username &&
-      password === credentials.password;
-
-    console.log("hello");
-
-    dispatch(auth(status));
-
-    if (status) {
-      toast.success("user validated");
-      navigate("/");
-    } else {
-      toast.error("Entered credentials is invalid");
-    }
-  };
-
   const handleCancel = () => {
-    navigate("/");
+    navigate(-1);
   };
 
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
   }, []);
+
+  const goToSignUpPage = () => {
+    navigate("/signup", { replace: true });
+  };
 
   return (
     <div className="bg-gray-50   flex-1  ">
@@ -229,19 +210,19 @@ const Login = () => {
                 </div>
               </div> */}
 
-              <div className="flex items-center justify-between">
+              <div className="flex space-x-2">
                 <button
                   type="submit"
-                  className="w-[50%] text-slate-200 bg-red-500 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-md text-sm px-5 py-2.5 text-center"
+                  className="w-full text-slate-200 bg-red-500 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-md text-sm px-5 py-2.5 text-center mt-2"
                 >
                   Login
                 </button>
                 <button
-                  type="submit"
-                  className="  w-[20%] text-black bg-gray-200  focus:ring-3 focus:outline-none focus:ring-primary-300 font-medium rounded-md text-sm px-5 py-2.5 "
+                  type="button"
                   onClick={handleCancel}
+                  className="w-full text-gray-600 border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-md text-sm px-5 py-2.5 text-center mt-2"
                 >
-                  cancel
+                  Cancel
                 </button>
               </div>
 
@@ -262,7 +243,7 @@ const Login = () => {
               </div>
             </div>
 
-            <div className="mt-6 grid grid-cols-3 gap-3">
+            {/* <div className="mt-6 grid grid-cols-3 gap-3">
               <div>
                 <a
                   href="#"
@@ -287,13 +268,16 @@ const Login = () => {
                   <FcGoogle size={"1.5rem"} />
                 </a>
               </div>
-            </div>
+            </div> */}
 
             <p className="text-sm  text-gray-500   font-medium">
               Dont have an account?{" "}
-              <Link to="/signup" className=" text-red-600 hover:underline ">
+              <span
+                onClickCapture={goToSignUpPage}
+                className=" text-red-600 hover:underline cursor-pointer"
+              >
                 Sign Up
-              </Link>
+              </span>
             </p>
           </div>
           {/* <div className=" flex justify-end mb-3 p-2">

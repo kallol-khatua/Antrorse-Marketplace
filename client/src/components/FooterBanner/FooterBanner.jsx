@@ -1,5 +1,6 @@
 import React from 'react'
-import video from '../../assets/images/video.mp4'
+import video from "../../assets/images/feature-product-video-one.mp4"
+// import video from '../../assets/images/video.mp4'
 import video1 from '../../assets/images/video2.mp4'
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";

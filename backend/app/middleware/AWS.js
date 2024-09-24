@@ -1,28 +1,31 @@
-require("dotenv").config()
-const aws = require("aws-sdk");
+require("dotenv").config();
+const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 
-aws.config.update({
-  accessKeyId: process.env.AWS_ACCESS_KEY,
-  secretAccessKey: process.env.AWS_SECRET_KEY,
+const s3Client = new S3Client({
   region: "ap-south-1",
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY,
+    secretAccessKey: process.env.AWS_SECRET_KEY,
+  },
 });
+
 let uploadFile = async (file) => {
-  return new Promise((resolve, reject) => {
-    let s3 = new aws.S3({ apiVersion: "2006-03-01" });
-    let uploadParam = {
+  return new Promise(async (resolve, reject) => {
+    const uploadParam = {
       ACL: "public-read",
       Bucket: "antrorse-market-place",
       Key: file.originalname,
       Body: file.buffer,
     };
-    s3.upload(uploadParam, function (err, data) {
-      if (err) {
-        return reject(err);
-      }
-      if (data) {
-        return resolve(data.Location);
-      }
-    });
+
+    try {
+      const command = new PutObjectCommand(uploadParam);
+      const data = await s3Client.send(command);
+      resolve(`https://${uploadParam.Bucket}.s3.${s3Client.config.region}.amazonaws.com/${uploadParam.Key}`);
+    } catch (err) {
+      reject(err);
+    }
   });
 };
+
 module.exports = { uploadFile };

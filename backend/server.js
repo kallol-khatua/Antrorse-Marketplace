@@ -30,7 +30,7 @@ app.use("/api/admin", adminRoute)
 app.use("/api/order", orderRouter)
 app.use("/api/checkout", checkoutRouter)
 app.use("/api", phonepeRoute);
-app.use("/app", invoiceRouter)
+// app.use("/app", invoiceRouter)
 
 
 const port = process.env.PORT_NUMBER || 3687;

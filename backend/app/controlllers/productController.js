@@ -7,8 +7,8 @@ const validation = require("../helper/validation");
 const commonFunction = require("../helper/commonFunction");
 const mongoose = require("mongoose");
 const { uploadFile } = require("../middleware/AWS");
-// const Product = require("../models/products/Product")
-const Inventory = require("../models/products/Inventory")
+// const Product = require("../models/products/product")
+const Inventory = require("../models/products/variantInventory")
 const Variant = require("../models/products/variant")
 
 

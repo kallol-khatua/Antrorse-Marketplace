@@ -1,6 +1,6 @@
 const userModel = require("../models/user/userModel");
 const sellerModel = require("../models/seller/sellerModels");
-const productModel = require("../models/products/productModel");
+const productModel = require("../models/products/product");
 const response = require("../helper/commonResponse");
 const { SuccessMessage, ErrorMessage } = require("../helper/message");
 const { ErrorCode, SuccessCode } = require("../helper/statusCode");

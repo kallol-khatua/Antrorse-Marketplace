@@ -3,14 +3,15 @@ import { lazy } from "react";
 
 import MainLayout from "./components/MainLayout/MainLayout";
 import Home from "./Pages/Home/Home";
-const Login = lazy(() => import("./Pages/Login/Login"));
-const SignUp = lazy(() => import("./Pages/SignUpPage/SignUp"));
+import Login from "./Pages/Login/Login";
+import SignUp from "./Pages/SignUpPage/SignUp";
 
 //  =================== Seller Dashboard =================== //
 import SellerDashboardLayout from "./components/SellerDashboardLayout/SellerDashboardLayout";
 const Metric = lazy(() => import("./components/Metric/Metric"));
 const SellerAccount = lazy(() => import("./Pages/sellerAccount/SellerAcount"));
 const AddProd = lazy(() => import("./Pages/addProduct/Addprod"));
+const AddProduct = lazy(() => import("./Pages/addProduct/AddProduct"))
 
 import Checkout from "./Pages/Checkout/Checkout";
 import ProductPage from "./Pages/ProductPage/ProductPage";
@@ -22,7 +23,6 @@ import SellerSupport from "./Pages/sellerSupport/SellerSupport";
 import AdminProfile from "./Pages/Admin/AdminProfilePage/AdminProfile";
 import KYCForm from "./Pages/sellerKyc/SellerKyc";
 import SellerSignUp from "./Pages/sellerKyc/SellerSignup";
-import AddProduct from "./Pages/addProduct/AddProduct";
 import NotFound from "./components/404/NotFound";
 import OrderCompleted from "./Pages/OrderComplete/OrderCompleted";
 import Orders from "./Pages/Order/Order";
@@ -76,7 +76,8 @@ function App() {
         <Route path="/seller" element={<SellerDashboardLayout />}>
           <Route path="dashboard" element={<Metric />} />
           <Route path="profile" element={<SellerAccount />} />
-          <Route path="add-product" element={<AddProd />} />
+          <Route path="add-product" element={<AddProduct />} />
+          <Route path="all-products" element={<AddProduct />} />
           <Route path="orders" element={<Metric />} />
           <Route path="settings" element={<Metric />} />
           <Route path="help-and-support" element={<Metric />} />

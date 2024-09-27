@@ -48,7 +48,8 @@ const SellerLogin = () => {
             localStorage.setItem("isAuthorizedSeller", JSON.stringify(true));
             localStorage.setItem(
               "sellerAuthToken",
-              JSON.stringify(response.data.authToken)
+              // JSON.stringify(response.data.authToken)
+              response.data.authToken
             );
             navigate("/seller/dashboard", { replace: true });
             window.location.reload();

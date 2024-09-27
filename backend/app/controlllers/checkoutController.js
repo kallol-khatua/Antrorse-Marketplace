@@ -6,7 +6,7 @@ const commonFunction = require("../helper/commonFunction");
 const validation = require("../helper/validation");
 
 const Cart = require("../models/cart/cartModels");
-const Product = require("../models/products/productModel");
+const Product = require("../models/products/product");
 const Address = require("../models/user/userAddressModel");
 const Seller = require("../models/seller/sellerModels");
 

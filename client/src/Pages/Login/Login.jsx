@@ -24,10 +24,10 @@ const Login = () => {
   };
 
   const loginSchema = Yup.object({
-      mobile_number: Yup.string()
-        .matches(/^\d{10}$/, "Mobile number must be 10 digits")
-        .required("A phone number is required"),
-      password: Yup.string().min(8).required("Please enter your password"),
+    mobile_number: Yup.string()
+      .matches(/^\d{10}$/, "Mobile number must be 10 digits")
+      .required("A phone number is required"),
+    password: Yup.string().min(8).required("Please enter your password"),
   });
 
   const dispatch = useDispatch();

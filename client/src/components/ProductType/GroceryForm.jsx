@@ -1,30 +1,86 @@
-import React from "react";
+import React, { useState } from "react";
+import CreatableSelect from "react-select/creatable";
 
-function ElectronicsForm({ handleVariation }) {
+
+function GroceryForm({ product, handleChange, handleSubmit }) {
+  const [tags, setTags] = useState([]);
+  const [suggestions, setSuggestions] = useState([
+    { value: "Rice", label: "Rice" },
+    { value: "soap", label: "soap" },
+    { value: "Oil", label: "Oil" },
+    { value: "Spices", label: "Spices" },
+    { value: "others", label: "others" },
+
+    // Add more suggestions as needed
+  ]);
+  const handleChangetag = (selectedTags) => {
+    setTags(selectedTags);
+  };
+  const handleCreateTag = (inputValue) => {
+    // Create a new tag if it doesn't exist in suggestions
+    if (
+      !suggestions.some(
+        (suggestion) =>
+          suggestion.label.toLowerCase() === inputValue.toLowerCase()
+      )
+    ) {
+      setSuggestions((prevSuggestions) => [
+        ...prevSuggestions,
+        { value: inputValue.toLowerCase(), label: inputValue },
+      ]);
+    }
+    // Add the newly created tag to the selected tags
+    setTags((prevTags) => [
+      ...prevTags,
+      { value: inputValue.toLowerCase(), label: inputValue },
+    ]);
+  };
+
+  const colourStyles = {
+    control: (styles) => ({ ...styles, backgroundColor: "white" }),
+    option: (styles) => {
+      return {
+        ...styles,
+        color: "gray",
+      };
+    },
+    multiValue: (styles) => {
+      return {
+        ...styles,
+        backgroundColor: "#A3EBB1", // Change the background color of selected tags here
+      };
+    },
+    multiValueLabel: (styles) => ({
+      ...styles,
+      color: "black", // Change the text color of selected tags here
+    }),
+  };
+
   return (
     <div>
       <div className=" mx-auto mt-6 p-6   bg-white rounded-md shadow-sm  border ">
         <h2 className="text-lg text-start font-bold mb-6">
           Product Information
         </h2>
-        <form>
-          <label
-            className="text-start block text-gray-700 text-md    mb-2"
-            htmlFor="productName"
-          >
-            Product Catagory
-          </label>
-          <input
-            type="text"
-            id="productType"
-            name="productType"
-            // value={product.productType}
-            onChange={(e) =>
-              handleVariation("category_selection", e.target.value)
-            }
-            className="w-full border border-gray-300 p-2 rounded-md placeholder:text-xs"
-            required
-          />
+        <form onSubmit={handleSubmit}>
+          {/* tags */}
+          <div>
+            <label
+              className="block text-gray-700 text-md  mb-2"
+              htmlFor="productName"
+            >
+              Select category
+            </label>
+
+            <CreatableSelect
+              isMulti
+              options={suggestions}
+              value={tags}
+              styles={colourStyles}
+              onChange={handleChangetag}
+              onCreateOption={handleCreateTag}
+            />
+          </div>
 
           <div className="flex gap-x-2">
             <div className="text-start w-1/2">
@@ -32,16 +88,14 @@ function ElectronicsForm({ handleVariation }) {
                 className="block text-gray-700 text-md mb-2"
                 htmlFor="color"
               >
-                Camera pixel
+                Quantity
               </label>
               <input
                 type="text"
                 id="color"
                 name="color"
                 // value={product.productName}
-                onChange={(e) =>
-                  handleVariation("camera_pixel", e.target.value)
-                }
+                onChange={handleChange}
                 className="w-full border border-gray-300 p-2 rounded-md"
                 required
               />
@@ -52,14 +106,14 @@ function ElectronicsForm({ handleVariation }) {
                 className="block text-gray-700 text-md mb-2"
                 htmlFor="material"
               >
-                Screen Size
+                Weight
               </label>
               <input
                 type="text"
                 id="material"
                 name="material"
                 // value={product.productName}
-                onChange={(e) => handleVariation("screen_size", e.target.value)}
+                onChange={handleChange}
                 className="w-full border border-gray-300 p-2 rounded-md"
                 required
               />
@@ -79,7 +133,7 @@ function ElectronicsForm({ handleVariation }) {
                 id="productType"
                 name="productType"
                 // value={product.productType}
-                onChange={(e) => handleVariation("brand_name", e.target.value)}
+                onChange={handleChange}
                 className="w-full border border-gray-300 p-2 rounded-md placeholder:text-xs"
                 required
               />
@@ -89,16 +143,14 @@ function ElectronicsForm({ handleVariation }) {
                 className="text-start block text-gray-700 text-md    mb-2"
                 htmlFor="productName"
               >
-                Model Number
+                Packaging
               </label>
               <input
                 type="text"
                 id="productType"
                 name="productType"
                 // value={product.productType}
-                onChange={(e) =>
-                  handleVariation("model_number", e.target.value)
-                }
+                onChange={handleChange}
                 className="w-full border border-gray-300 p-2 rounded-md placeholder:text-xs"
                 required
               />
@@ -111,18 +163,28 @@ function ElectronicsForm({ handleVariation }) {
                 className="block text-gray-700 text-md mb-2"
                 htmlFor="warrantyStatus"
               >
-                Warranty Information
+                Best Before
               </label>
               <input
-                type="text"
+                type="date"
                 id="warrantyStatus"
                 name="warrantyStatus"
                 // value={product.warrantyStatus}
-                onChange={(e) => handleVariation("warranty", e.target.value)}
+                onChange={handleChange}
                 className="w-full border border-gray-300 p-2 rounded-md placeholder:text-xs"
                 required
               />
             </div>
+          </div>
+
+          <div className="mt-6 flex justify-center">
+            <button
+              onClick={handleSubmit}
+              type="submit"
+              className="w-1/3 bg-green-500 text-white p-2 rounded-md hover:bg-blue-600"
+            >
+              Submit
+            </button>
           </div>
         </form>
       </div>
@@ -130,4 +192,4 @@ function ElectronicsForm({ handleVariation }) {
   );
 }
 
-export default ElectronicsForm;
+export default GroceryForm;

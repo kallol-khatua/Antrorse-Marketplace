@@ -85,4 +85,6 @@ sellerSchema.methods.generateAuthToken = function () {
     return token;
 }
 
-module.exports = mongoose.model("seller", sellerSchema);
+const Seller = mongoose.model("Seller", sellerSchema);
+
+module.exports = Seller;

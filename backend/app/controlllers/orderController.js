@@ -1,7 +1,7 @@
 // const Order = require("../models/order/orderModel");
-const Product = require("../models/products/productModel");
+const Product = require("../models/products/product");
 const cartModels = require("../models/cart/cartModels");
-const productModel = require("../models/products/productModel");
+const productModel = require("../models/products/product");
 const addressModel = require("../models/user/userAddressModel");
 const response = require("../helper/commonResponse");
 const { ErrorCode, SuccessCode } = require("../helper/statusCode");

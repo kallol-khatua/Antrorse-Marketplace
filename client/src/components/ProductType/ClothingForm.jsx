@@ -7,6 +7,16 @@ function ClothingForm({ handleVariation }) {
   const [color, setColor] = useState("");
   const [colors, setColors] = useState([]);
 
+  const [productData, setproductData] = useState({
+    product_name: "",
+    product_description: "",
+    product_type: "Clothings",
+    unit_of_measurement: "piece",
+
+    generic_name: "Shirt",
+    pack_of: "1",
+  });
+
   const [sizes, setSizes] = useState([
     { label: "XS", value: 0 },
     { label: "S", value: 0 },
@@ -68,15 +78,118 @@ function ClothingForm({ handleVariation }) {
     handleVariation("Material", material);
     handleVariation("colors", colors);
     handleVariation("sizes", sizes);
-  }, [material, color,sizes]);
+  }, [material, color, sizes]);
+
+  const handleProductDataChange = (e) => {
+    const { name, value } = e.target;
+    setproductData((prev) => ({ ...prev, [name]: value }));
+  };
 
   return (
     <div>
-      <div className=" mx-auto mt-6 p-6   bg-white rounded-md shadow-sm  border ">
-        <h2 className="text-lg text-start font-bold mb-6">
+      <div className=" mx-auto p-6  pt-2 bg-white rounded-md shadow-sm  border ">
+        <h2 className="text-lg text-start font-bold m-3">
           Product Information
         </h2>
         <form>
+          <div className="flex gap-x-2 w-full my-1">
+            {/* Product name */}
+            <div className="text-start flex flex-col w-1/2">
+              <label
+                className="block text-gray-700 text-md font-bold mb-1 "
+                htmlFor="generic_name"
+              >
+                Generic Name
+              </label>
+              <select
+                id="generic_name"
+                name="generic_name"
+                value={productData.generic_name}
+                onChange={(e) => handleProductDataChange(e)}
+                className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-base"
+              >
+                <option value="Shirt">Shirt</option>
+                <option value="T Shirt">T Shirt</option>
+              </select>
+            </div>
+
+            <div className="text-start flex flex-col w-1/2">
+              <label
+                className="block text-gray-700 text-md font-bold mb-1 "
+                htmlFor="pack_of"
+              >
+                Pack of
+              </label>
+              <input
+                type="number"
+                id="pack_of"
+                name="pack_of"
+                value={productData.pack_of}
+                onChange={(e) => handleProductDataChange(e)}
+                className="w-full border border-gray-300 p-2 rounded-md placeholder:text-base"
+                placeholder="Enter product name here"
+              />
+            </div>
+          </div>
+
+          <div className="flex gap-x-2 w-full my-1">
+            {/* Product name */}
+            <div className="text-start flex flex-col w-full">
+              <label
+                className="block text-gray-700 text-md font-bold mb-1 "
+                htmlFor="product_name"
+              >
+                Product Name
+              </label>
+              <input
+                type="text"
+                id="product_name"
+                name="product_name"
+                value={productData.product_name}
+                onChange={(e) => handleProductDataChange(e)}
+                className="w-full border border-gray-300 p-2 rounded-md placeholder:text-base"
+                placeholder="Enter product name here"
+              />
+            </div>
+
+            {/* <div className="text-start flex flex-col w-1/2">
+              <label
+                className="block text-gray-700 text-md font-bold mb-2"
+                htmlFor="stock"
+              >
+                Unit of measurement
+              </label>
+              <select
+                id="custom-select"
+                name="unit_of_measurement"
+                value={productData.unit_of_measurement}
+                onChange={(e) => handleProductDataChange(e)}
+                className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-base"
+              >
+                <option value="piece">Piece</option>
+              </select>
+            </div> */}
+          </div>
+
+          <div className="w-full my-1">
+            <label
+              className="block text-gray-700 text-md font-bold mb-1 "
+              htmlFor="product_description"
+            >
+              Product Description
+            </label>
+
+            <textarea
+              id="product_description"
+              name="product_description"
+              cols="30"
+              rows="3"
+              className="bg-gray-50 border-2 border-gray-400 rounded-md p-2 w-full"
+              placeholder="Write product description"
+              value={productData.product_description}
+              onChange={(e) => handleProductDataChange(e)}
+            ></textarea>
+          </div>
           <div className="">
             <label
               className="text-start block text-gray-700 text-md    mb-2"
@@ -266,6 +379,16 @@ function ClothingForm({ handleVariation }) {
                 ))}
               </div>
             </div>
+          </div>
+
+          <div className="mt-6 flex justify-center">
+            <button
+              // onClick={handleSubmit}
+              type="submit"
+              className="w-1/3 bg-green-500 text-white p-2 rounded-md hover:bg-blue-600"
+            >
+              Submit
+            </button>
           </div>
         </form>
       </div>

@@ -1,135 +1,114 @@
-import { useEffect, useState } from "react";
-import CreatableSelect from "react-select/creatable";
-
+import { useState } from "react";
 import "react-tagsinput/react-tagsinput.css";
 import ProductType from "../../components/ProductType/ProductType";
-import axios from "axios";
 
 const AddProd = () => {
-  const [imagesPreview, setImagesPreview] = useState([]);
+  // const [imagesPreview, setImagesPreview] = useState([]);
   const [product, setProduct] = useState({
+    product_name: "",
     description: "",
-    tags: [],
-    images: [],
-    name: "",
-    productType: "",
-    price: "",
-    discount: "",
-    stock: "",
-    dimensions: {
-      height: "",
-      width: "",
-      length: "",
-      weight: "",
-    },
-    variation: {
-      category_selection: "",
-      brand_name: "",
-      Material: [],
-      sizes: [],
-      color: [],
-      camera_pixel: "",
-      screen_size: "",
-      model_number: "",
-      warranty: "",
-    },
+    quantity: "",
+    min_order_quantity: "",
+    actual_price: "",
+    offered_price: "",
+    unit_of_measurement: "piece",
+    location: "",
   });
 
-  const maxAllowedImages = 5;
+  // const maxAllowedImages = 5;
 
-  const [suggestions, setSuggestions] = useState([
-    { value: "shirt", label: "Shirt" },
-    { value: "jeans", label: "Jeans" },
-    { value: "mobile", label: "Mobile" },
-    { value: "laptop", label: "Laotop" },
-    { value: "watch", label: "Watch" },
-    { value: "jacket", label: "Jeans" },
-    { value: "joggers", label: "Joogers" },
-    // Add more suggestions as needed
-  ]);
+  // const [suggestions, setSuggestions] = useState([
+  //   { value: "shirt", label: "Shirt" },
+  //   { value: "jeans", label: "Jeans" },
+  //   { value: "mobile", label: "Mobile" },
+  //   { value: "laptop", label: "Laotop" },
+  //   { value: "watch", label: "Watch" },
+  //   { value: "jacket", label: "Jeans" },
+  //   { value: "joggers", label: "Joogers" },
+  //   // Add more suggestions as needed
+  // ]);
 
-  const handleMultiImageChange = (e) => {
-    const files = e.target.files;
+  // const handleMultiImageChange = (e) => {
+  //   const files = e.target.files;
 
-    setProduct((prev) => ({
-      ...prev,
-      images: [...prev.images, ...Array.from(files)],
-    }));
+  //   setProduct((prev) => ({
+  //     ...prev,
+  //     images: [...prev.images, ...Array.from(files)],
+  //   }));
 
-    Array.from(files).forEach((file) => {
-      if (imagesPreview.length < maxAllowedImages) {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => {
-          setImagesPreview((prev) => [...prev, reader.result]);
-        };
-      }
-    });
-  };
+  //   Array.from(files).forEach((file) => {
+  //     if (imagesPreview.length < maxAllowedImages) {
+  //       const reader = new FileReader();
+  //       reader.readAsDataURL(file);
+  //       reader.onload = () => {
+  //         setImagesPreview((prev) => [...prev, reader.result]);
+  //       };
+  //     }
+  //   });
+  // };
 
+  // const handleRemoveImage = (index) => {
+  //   const updatedImages = [...product.images];
+  //   updatedImages.splice(index, 1);
 
-  const handleRemoveImage = (index) => {
-    const updatedImages = [...product.images];
-    updatedImages.splice(index, 1);
+  //   setProduct((prev) => ({ ...prev, images: updatedImages }));
+  // };
 
-    setProduct((prev) => ({ ...prev, images: updatedImages }));
-  };
+  // const handleChangetag = (selectedOptions) => {
+  //   const selectedOptionsValue = selectedOptions.map((tag) => tag.value);
 
-  const handleChangetag = (selectedOptions) => {
-    const selectedOptionsValue = selectedOptions.map((tag) => tag.value);
+  //   const newTags = selectedOptionsValue.filter((tagValue) => {
+  //     return !product.tags.find(
+  //       (tag) => tag.value.toLowerCase() === tagValue.toLowerCase()
+  //     );
+  //   });
 
-    const newTags = selectedOptionsValue.filter((tagValue) => {
-      return !product.tags.find(
-        (tag) => tag.value.toLowerCase() === tagValue.toLowerCase()
-      );
-    });
+  //   newTags.forEach((tagValue) => {
+  //     setProduct((prevProduct) => ({
+  //       ...prevProduct,
+  //       tags: [...prevProduct.tags, { value: tagValue, label: tagValue }],
+  //     }));
+  //   });
+  // };
 
-    newTags.forEach((tagValue) => {
-      setProduct((prevProduct) => ({
-        ...prevProduct,
-        tags: [...prevProduct.tags, { value: tagValue, label: tagValue }],
-      }));
-    });
-  };
+  // const handleCreateTag = (inputValue) => {
+  //   const lowerCaseInputValue = inputValue.toLowerCase();
 
-  const handleCreateTag = (inputValue) => {
-    const lowerCaseInputValue = inputValue.toLowerCase();
+  //   if (
+  //     !suggestions.some(
+  //       (suggestion) => suggestion.label.toLowerCase() === lowerCaseInputValue
+  //     )
+  //   ) {
+  //     const newTag = { value: lowerCaseInputValue, label: inputValue };
 
-    if (
-      !suggestions.some(
-        (suggestion) => suggestion.label.toLowerCase() === lowerCaseInputValue
-      )
-    ) {
-      const newTag = { value: lowerCaseInputValue, label: inputValue };
+  //     setSuggestions((prevSuggestions) => [...prevSuggestions, newTag]);
 
-      setSuggestions((prevSuggestions) => [...prevSuggestions, newTag]);
+  //     setProduct((prevProduct) => ({
+  //       ...prevProduct,
+  //       tags: [...prevProduct.tags, newTag],
+  //     }));
+  //   }
+  // };
 
-      setProduct((prevProduct) => ({
-        ...prevProduct,
-        tags: [...prevProduct.tags, newTag],
-      }));
-    }
-  };
-
-  const colourStyles = {
-    control: (styles) => ({ ...styles, backgroundColor: "white" }),
-    option: (styles) => {
-      return {
-        ...styles,
-        color: "gray",
-      };
-    },
-    multiValue: (styles) => {
-      return {
-        ...styles,
-        backgroundColor: "#A3EBB1", // Change the background color of selected tags here
-      };
-    },
-    multiValueLabel: (styles) => ({
-      ...styles,
-      color: "black", // Change the text color of selected tags here
-    }),
-  };
+  // const colourStyles = {
+  //   control: (styles) => ({ ...styles, backgroundColor: "white" }),
+  //   option: (styles) => {
+  //     return {
+  //       ...styles,
+  //       color: "gray",
+  //     };
+  //   },
+  //   multiValue: (styles) => {
+  //     return {
+  //       ...styles,
+  //       backgroundColor: "#A3EBB1", // Change the background color of selected tags here
+  //     };
+  //   },
+  //   multiValueLabel: (styles) => ({
+  //     ...styles,
+  //     color: "black", // Change the text color of selected tags here
+  //   }),
+  // };
 
   const handleVariation = (type, value) => {
     setProduct((prev) => ({
@@ -141,19 +120,22 @@ const AddProd = () => {
     }));
   };
 
-  const handleSubmit = async () => {
-    const response = await axios.post(
-      `${import.meta.env.VITE_BACKEND_URL}/app/product/AddProduct`,
-      product,
-      {
-        headers: {
-          token:
-            localStorage.getItem("sellerauthToken"),
-          "Content-Type": "multipart/form-data",
-          // "Content-Type": "application/json",
-        },
-      }
-    );
+  const resetProduct = () => {
+    setProduct({
+      product_name: "",
+      description: "",
+      quantity: "",
+      min_order_quantity: "",
+      actual_price: "",
+      offered_price: "",
+      unit_of_measurement: "piece",
+      location: "",
+    });
+  };
+
+  const handleProductDetailsChange = (e) => {
+    const { name, value } = e.target;
+    setProduct((prev) => ({ ...prev, [name]: value }));
   };
 
   return (
@@ -167,28 +149,48 @@ const AddProd = () => {
 
           <div className="flex w-full justify-between p-2">
             <div className="w-full  bg-white  flex flex-col p-6 gap-y-2 border shadow-lg rounded-md ">
-              <label
-                className="block text-gray-700 text-md font-bold   mb-2"
-                htmlFor="name"
-              >
-                Product Name
-              </label>
-              <input
-                type="text"
-                id="name"
-                name="name"
-                value={product.name}
-                onChange={(e) => {
-                  setProduct((prev) => {
-                    return { ...prev, name: e.target.value };
-                  });
-                }}
-                className="w-full border border-gray-300 p-2 rounded-md placeholder:text-ls"
-                placeholder="Enter product Name"
-              />
+              <div className="flex gap-x-2 w-full">
+                {/* Product name */}
+                <div className="text-start flex flex-col w-1/2">
+                  <label
+                    className="block text-gray-700 text-md font-bold mb-2 "
+                    htmlFor="product_name"
+                  >
+                    Product Name
+                  </label>
+                  <input
+                    type="text"
+                    id="product_name"
+                    name="product_name"
+                    value={product.product_name}
+                    onChange={(e) => handleProductDetailsChange(e)}
+                    className="w-full border border-gray-300 p-2 rounded-md placeholder:text-base"
+                    placeholder="Enter product name"
+                  />
+                </div>
+                {/* Quantity of product */}
+                <div className="text-start flex flex-col w-1/2">
+                  <label
+                    className="block text-gray-700 text-md font-bold   mb-2"
+                    htmlFor="quantity"
+                  >
+                    Quantity
+                  </label>
+                  <input
+                    type="number"
+                    id="quantity"
+                    name="quantity"
+                    value={product.quantity}
+                    onChange={(e) => handleProductDetailsChange(e)}
+                    placeholder="Enter quantity"
+                    className="w-full border border-gray-300 p-2 rounded-md"
+                    required
+                  />
+                </div>
+              </div>
 
               {/* //multiple image */}
-              <div className="">
+              {/* <div className="">
                 <div>
                   <h1 className="font-bold text-gray-700 text-lg text-start">
                     Product Image
@@ -248,79 +250,117 @@ const AddProd = () => {
                     </label>
                   </div>
                 </div>
-              </div>
+              </div> */}
 
-              <div className="flex gap-x-2">
-                <div className="text-start flex flex-col">
+              <div className="flex gap-x-2 w-full">
+                {/* Quantity of product */}
+                <div className="text-start flex flex-col w-1/2">
                   <label
-                    className="block text-gray-700 text-md   mb-2"
-                    htmlFor="price"
+                    className="block text-gray-700 text-md font-bold   mb-2"
+                    htmlFor="min_order_quantity"
                   >
-                    Price
+                    Minimum order quantity
                   </label>
                   <input
                     type="number"
-                    id="price"
-                    name="price"
-                    value={product.price}
-                    onChange={(e) => {
-                      setProduct((prev) => {
-                        return { ...prev, price: Number(e.target.value) };
-                      });
-                    }}
-                    className="w-full border border-gray-300 p-2 rounded-sm"
-                    required
-                  />
-                </div>
-                <div className="text-start flex flex-col">
-                  <label
-                    className="block text-gray-700 text-md whitespace-nowrap  mb-2"
-                    htmlFor="discount"
-                  >
-                    Discount Percent
-                  </label>
-                  <input
-                    type="number"
-                    id="discount"
-                    name="discount"
-                    value={product.discount}
-                    onChange={(e) => {
-                      setProduct((prev) => {
-                        return {
-                          ...prev,
-                          discount: Number(e.target.value),
-                        };
-                      });
-                    }}
+                    id="min_order_quantity"
+                    name="min_order_quantity"
+                    value={product.min_order_quantity}
+                    onChange={(e) => handleProductDetailsChange(e)}
+                    placeholder="Enter minimum order quantity"
                     className="w-full border border-gray-300 p-2 rounded-md"
                     required
                   />
                 </div>
-
-                <div className="text-start flex flex-col">
+                {/* unit of measurement  */}
+                <div className="text-start flex flex-col w-1/2">
                   <label
-                    className="block text-gray-700 text-md   mb-2"
+                    className="block text-gray-700 text-md font-bold mb-2"
                     htmlFor="stock"
                   >
-                    Stock
+                    Unit of measurement
+                  </label>
+                  <select
+                    id="custom-select"
+                    name="unit_of_measurement"
+                    value={product.unit_of_measurement}
+                    onChange={(e) => handleProductDetailsChange(e)}
+                    className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  >
+                    <option value="piece">Piece</option>
+                    <option value="kg">Kilogram (kg)</option>
+                    <option value="g">Gram (g)</option>
+                    <option value="L">Liter (L)</option>
+                    <option value="ml">Milliliter (ml)</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* price */}
+              <div className="flex gap-x-2 w-full">
+                <div className="text-start flex flex-col w-1/2">
+                  <label
+                    className="block text-gray-700 text-md font-bold mb-2"
+                    htmlFor="actual_price"
+                  >
+                    Actual price
                   </label>
                   <input
                     type="number"
-                    id="stock"
-                    name="stock"
-                    value={product.stock}
-                    onChange={(e) => {
-                      setProduct((prev) => {
-                        return { ...prev, stock: Number(e.target.value) };
-                      });
-                    }}
+                    id="actual_price"
+                    name="actual_price"
+                    value={product.actual_price}
+                    onChange={(e) => handleProductDetailsChange(e)}
                     className="w-full border border-gray-300 p-2 rounded-md"
+                    // placeholder={`Enter actual price per ${product.unit_of_measurement}`}
+                    placeholder="Enter actual price"
+                    required
+                  />
+                </div>
+                <div className="text-start flex flex-col w-1/2">
+                  <label
+                    className="block text-gray-700 text-md font-bold   mb-2"
+                    htmlFor="offered_price"
+                  >
+                    Offered price
+                  </label>
+                  <input
+                    type="number"
+                    id="offered_price"
+                    name="offered_price"
+                    value={product.offered_price}
+                    onChange={(e) => handleProductDetailsChange(e)}
+                    className="w-full border border-gray-300 p-2 rounded-md"
+                    placeholder="Enter offered price"
                     required
                   />
                 </div>
               </div>
 
-              <div className="flex gap-x-2">
+              <div className="flex gap-x-2 w-full">
+                <div className="text-start flex flex-col w-full">
+                  <label
+                    className="block text-gray-700 text-md font-bold mb-2"
+                    htmlFor="location"
+                  >
+                    Location
+                  </label>
+                  <input
+                    type="text"
+                    id="location"
+                    name="location"
+                    value={product.location}
+                    onChange={(e) => handleProductDetailsChange(e)}
+                    className="w-full border border-gray-300 p-2 rounded-md"
+                    // placeholder={`Enter actual price per ${product.unit_of_measurement}`}
+                    placeholder="Enter location of the product"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Dimension */}
+              {/* <div className="flex gap-x-2">
                 <div className="text-start flex flex-col">
                   <label
                     className="block text-gray-700 text-md   mb-2"
@@ -422,7 +462,7 @@ const AddProd = () => {
                     }}
                   />
                 </div>
-              </div>
+              </div> */}
 
               {/* //Description */}
               <div className="">
@@ -435,23 +475,19 @@ const AddProd = () => {
                 <hr />
 
                 <textarea
-                  name="description"
                   id="description"
+                  name="description"
                   cols="30"
-                  rows="8"
+                  rows="4"
                   className="bg-gray-50 border-2 border-gray-400 rounded-md p-2 w-full"
                   placeholder="Write product description"
                   value={product.description}
-                  onChange={(e) => {
-                    setProduct((prev) => {
-                      return { ...prev, description: e.target.value };
-                    });
-                  }}
+                  onChange={(e) => handleProductDetailsChange(e)}
                 ></textarea>
               </div>
 
               {/* tags */}
-              <div>
+              {/* <div>
                 <label
                   className="block text-gray-700 text-md font-bold mb-2"
                   htmlFor="tags"
@@ -468,29 +504,18 @@ const AddProd = () => {
                   }
                   onCreateOption={handleCreateTag}
                 />
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
 
         {/* right section */}
-        <div className="w-1/2">
-          <div className="">
-            <ProductType handleVariation={handleVariation} />
-          </div>
 
-          <div className="">
-            <div className="m-6 flex justify-center">
-              <button
-                onClick={handleSubmit}
-                type="submit"
-                className="w-1/3 bg-green-500 text-white p-2 rounded-md hover:bg-blue-600"
-              >
-                Submit
-              </button>
-            </div>
-          </div>
-        </div>
+        <ProductType
+          handleVariation={handleVariation}
+          basicProductInfo={product}
+          resetProduct={resetProduct}
+        />
       </div>
     </div>
   );
@@ -498,36 +523,34 @@ const AddProd = () => {
 
 export default AddProd;
 
-
-
 // const handleChange = (e) => {
-  //   const { name, value } = e.target;
-  //   if (
-  //     name === "productName" ||
-  //     name === "productType" ||
-  //     name === "description"
-  //   ) {
-  //     // String validation
-  //     if (!/^[a-zA-Z\s]*$/.test(value)) {
-  //       alert(
-  //         `Please enter a valid ${name}. Only letters and spaces are allowed.`
-  //       );
-  //       return;
-  //     }
-  //   } else if (
-  //     name === "price" ||
-  //     name === "discountPrice" ||
-  //     name === "stock"
-  //   ) {
-  //     // Number validation
-  //     if (!/^\d+$/.test(value)) {
-  //       alert(`Please enter a valid ${name}. Only numbers are allowed.`);
-  //       return;
-  //     }
-  //   }
+//   const { name, value } = e.target;
+//   if (
+//     name === "productName" ||
+//     name === "productType" ||
+//     name === "description"
+//   ) {
+//     // String validation
+//     if (!/^[a-zA-Z\s]*$/.test(value)) {
+//       alert(
+//         `Please enter a valid ${name}. Only letters and spaces are allowed.`
+//       );
+//       return;
+//     }
+//   } else if (
+//     name === "price" ||
+//     name === "discountPrice" ||
+//     name === "stock"
+//   ) {
+//     // Number validation
+//     if (!/^\d+$/.test(value)) {
+//       alert(`Please enter a valid ${name}. Only numbers are allowed.`);
+//       return;
+//     }
+//   }
 
-  //   setProduct((prevProduct) => ({
-  //     ...prevProduct,
-  //     [name]: value,
-  //   }));
-  // };
+//   setProduct((prevProduct) => ({
+//     ...prevProduct,
+//     [name]: value,
+//   }));
+// };

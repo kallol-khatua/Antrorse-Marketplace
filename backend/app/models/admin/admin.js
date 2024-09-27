@@ -2,16 +2,16 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 
 const adminSchema = new mongoose.Schema({
-   
+
     mobile_number: {
         type: String,
         unique: true,
         required: true
-        
+
     },
     password: {
         type: String,
-       
+
     },
     security_answer: {
         type: String,
@@ -21,7 +21,7 @@ const adminSchema = new mongoose.Schema({
     timestamps: true,
 });
 
-let adminModel= mongoose.model("admin", adminSchema)
+let Admin = mongoose.model("Admin", adminSchema)
 
 // this function for hass Data
 async function hashData(data) {
@@ -37,23 +37,24 @@ async function hashData(data) {
 
 
 
- async function createAdmin(){
-   try{
-    let mobile_number= "7319961224"
-    let password= await hashData("123")
-    let security_answer= await hashData("myName")
-    let data={mobile_number,password,security_answer}
-    let findData= await adminModel.findOne()
-    if(!findData){
-     await adminModel.create(data)
-    }else{
-        await adminModel.findOneAndUpdate({_id:findData._id},{$set:data})
-    }
-    
-   }
-   catch(err){
-    console.log(err.message)
-   }
-}
-createAdmin()
-module.exports=adminModel
+// async function createAdmin() {
+//     try {
+//         let mobile_number = "7319961224"
+//         let password = await hashData("123")
+//         let security_answer = await hashData("myName")
+//         let data = { mobile_number, password, security_answer }
+//         let findData = await adminModel.findOne()
+//         if (!findData) {
+//             await adminModel.create(data)
+//         } else {
+//             await adminModel.findOneAndUpdate({ _id: findData._id }, { $set: data })
+//         }
+
+//     }
+//     catch (err) {
+//         console.log(err.message)
+//     }
+// }
+// createAdmin()
+
+module.exports = Admin

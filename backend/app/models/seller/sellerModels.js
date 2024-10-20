@@ -42,6 +42,9 @@ const sellerSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    pin_code: {
+        type: Number,
+    },
     // company_pan_number: {
     //     type: String
     // },
@@ -76,7 +79,15 @@ const sellerSchema = new mongoose.Schema({
     isActive: {
         type: Boolean,
         default: false
-    }
+    },
+    isApproved: {
+        type: Boolean,
+        default: false
+    },
+    isRejected: {
+        type: Boolean,
+        default: false
+    },
 }, { timestamps: true, });
 
 // generating jwt token

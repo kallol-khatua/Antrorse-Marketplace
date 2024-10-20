@@ -1,9 +1,12 @@
 import { Outlet } from "react-router-dom";
 import Navbar from "../Navbar/Navbar";
 import Footer from "../Footer/Footer";
-import { Suspense } from "react";
+import { Suspense, useEffect } from "react";
 
 function MainLayout() {
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+  }, []);
   return (
     <>
       <Navbar />

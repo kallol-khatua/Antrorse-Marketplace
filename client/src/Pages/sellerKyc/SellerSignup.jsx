@@ -5,6 +5,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { setSellerAuth } from "../../redux/features/Seller/SellerSclice";
+import { toast } from "react-toastify";
 
 const SellerSignUp = () => {
   const navigate = useNavigate();
@@ -62,15 +63,7 @@ const SellerSignUp = () => {
           const response = await axios.post(url, values);
 
           if (response.status === 201) {
-            // console.log(response);
-            // console.log(response.data);
-            dispatch(setSellerAuth(true));
-            localStorage.setItem("isAuthorizedSeller", JSON.stringify(true));
-            localStorage.setItem(
-              "sellerAuthToken",
-              JSON.stringify(response.data.authToken)
-            );
-
+            toast.success("Seller application submitted");
             navigate("/");
           }
         } catch (error) {

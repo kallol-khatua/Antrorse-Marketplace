@@ -22,9 +22,51 @@ const productSchema = new Schema({
     }
   ],
 
+  isApproved: {
+    type: Boolean,
+    default: false
+  },
+  isRejected: {
+    type: Boolean,
+    default: false
+  },
+
   unit_of_measurement: { // piece
     type: String,
-    required: true
+  },
+
+  generic_name: {
+    type: String,
+    // enum: ['Shirt', 'T Shirt'],
+  },
+  pack_of: {
+    type: Number,
+    // enum: [1, 2, 3, 4, 5],
+  },
+  quantity_type: {
+    type: String,
+  },
+  model_name: {
+    type: String
+  },
+  type: {
+    type: String
+  },
+  brand_name: {
+    type: String
+  },
+  country_of_origin: {
+    type: String,
+  },
+  storage_conditions: {
+    type: String,
+  },
+  inventory_location: {
+    type: String
+  },
+
+  specifications: {
+    type: String
   },
 
   image: {
@@ -61,31 +103,14 @@ const productSchema = new Schema({
 
 
   // ================ Clothing ================ //
-  generic_name: {
-    type: String
-  },
-  pack_of: {
-    type: Number
-  },
-  // ================ Clothing ================ //
-
-  // ================ Clothing - Shirt ================ //
-  closure: {
+  ideal_for: {
     type: String,
+    enum: ['Men', 'Women', "Boys", "Girls"],
   },
   fit: {
     type: String,
   },
   fabric: {
-    type: String,
-  },
-  sleeve: {
-    type: String,
-  },
-  pattern: {
-    type: String,
-  },
-  collar: {
     type: String,
   },
   fabric_care: {
@@ -94,21 +119,51 @@ const productSchema = new Schema({
   suitable_for: {
     type: String,
   },
+  is_returnable: {
+    type: Boolean,
+  },
+  return_within_days: {
+    type: Number,
+  },
+  returnable_condition: {
+    type: String
+  },
+  min_order_quantity: {
+    type: Number,
+  },
+  // ================ Clothing ================ //
+
+  // ================ Clothing - Shirt and T Shirt - Common ================ //
+  sleeve: {
+    type: String,
+  },
+  pattern: {
+    type: String,
+  },
   reversible: {
-    type: String, // No / Yes
-    // enum
+    type: String,
+    enum: ['No', 'Yes'],
+  },
+
+  // ================ Clothing - Shirt and T Shirt - Common ================ //
+
+  // ================ Clothing - Shirt ================ //
+  closure: {
+    type: String,
+  },
+  collar: {
+    type: String,
   },
   hem: {
     type: String,
   },
-  country_of_origin: {
-    type: String,
-  },
-  ideal_for: {
-    type: String,
-  },
-
   // ================ Clothing - Shirt ================ //
+
+  // ================ Clothing - T Shirt ================ //
+  neck_type: {
+    type: String,
+  },
+  // ================ Clothing - T Shirt ================ //
 }, { timestamps: true });
 
 const Product = mongoose.model("Product", productSchema);

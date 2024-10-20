@@ -24,15 +24,15 @@ const inventorySchema = new Schema({
         type: Number,
         default: 0
     },
-    min_quantity: {
-        type: Number,
-    },
+    // min_quantity: {
+    //     type: Number,
+    // },
 
-    inventory_location: {
-        type: String
-    }
+    // inventory_location: {
+    //     type: String
+    // }
 }, { timestamps: true });
 
-const Inventory = mongoose.model("Inventory", inventorySchema);
+const VariantInventory = mongoose.model("VariantInventory", inventorySchema);
 
-module.exports = Inventory;
+module.exports = VariantInventory;

@@ -8,7 +8,14 @@ const variantSchema = new Schema({
         ref: "Product",
         required: true
     },
+    images: {
+        url: {
+            type: String
+        }
+    },
+    // ================ Common for all ================ //
 
+    // ================ Foods & Beverages ================ //
     actual_price: {
         type: Number,
     },
@@ -19,12 +26,7 @@ const variantSchema = new Schema({
     min_order_quantity: {
         type: Number,
     },
-    // ================ Common for all ================ //
 
-    // ================ Foods & Beverages ================ //
-    quantity_type: {
-        type: String,
-    },
     volume_per_unit: {
         type: Number,
     },
@@ -47,24 +49,23 @@ const variantSchema = new Schema({
     calories: {
         type: Number,
     },
-    country_of_origin: {
-        type: String,
-    },
-
     packaging_type: {
-        type: String,
-    },
-    brand_name: {
-        type: String
-    },
-    storage_conditions: {
         type: String,
     },
     // ================ Foods & Beverages ================ //
 
     // ================ Clothing ================ //
-
+    primary_color: {
+        type: String,
+    },
+    secondary_color: {
+        type: String,
+    },
     // ================ Clothing ================ //
+
+    // ================ Clothing - Shirt ================ //
+
+    // ================ Clothing - Shirt ================ //
 }, { timestamps: true });
 
 const Variant = mongoose.model("Variant", variantSchema);

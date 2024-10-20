@@ -3,13 +3,13 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { Link } from "react-router-dom";
-import banner1 from '../../assets/images/product-19.png'
-import banner2 from '../../assets/images/product-16.png'
-import banner3 from '../../assets/images/product-6.jpg'
-import banner4 from '../../assets/images/product-2.jpg'
-import banner5 from '../../assets/images/product-3.jpg'
-import banner6 from '../../assets/images/product-4.jpg'
-
+import banner1 from "../../assets/images/product-19.png";
+import banner2 from "../../assets/images/product-16.png";
+import banner3 from "../../assets/images/product-6.jpg";
+import banner4 from "../../assets/images/product-2.jpg";
+import banner5 from "../../assets/images/product-3.jpg";
+import banner6 from "../../assets/images/product-4.jpg";
+import shirtCategory from "../../assets/images/shirt-category.jpeg";
 
 const Category = () => {
   const categoryList = [
@@ -20,7 +20,7 @@ const Category = () => {
     },
     {
       id: 2,
-      img:banner2,
+      img: banner2,
       title: "METALLIC AGARBATTI ",
     },
     {
@@ -30,7 +30,7 @@ const Category = () => {
     },
     {
       id: 4,
-      img:banner4,
+      img: banner4,
       title: "METALLIC DHOOP STICK ",
     },
     {
@@ -40,16 +40,22 @@ const Category = () => {
     },
     {
       id: 6,
-      img:banner6,
+      img: banner6,
       title: " METALLIC DHOOP CONE ",
     },
     {
       id: 7,
+      img: shirtCategory,
+      title: "SHIRTS",
+      url: "/clothings/shirts"
+    },
+    {
+      id: 8,
       img: banner3,
       title: "BHEEMSENI CAMPHOR",
     },
     {
-      id: 8,
+      id: 9,
       img: banner2,
       title: "METALLIC AGARBATTI",
     },
@@ -85,7 +91,7 @@ const Category = () => {
       <Slider {...settings} className="w-[90vw] h-fit slide ">
         {categoryList.map((category) => (
           <Link
-            to="/viewproducts"
+            to={category.url ? category.url : "/viewproducts"}
             key={category.id}
             className=" w-[15rem] h-[15rem]  cursor-pointer transition-opacity duration-300 group-hover:bg-opacity-0"
           >

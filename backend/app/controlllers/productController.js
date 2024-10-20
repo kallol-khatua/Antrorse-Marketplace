@@ -8,9 +8,11 @@ const commonFunction = require("../helper/commonFunction");
 const mongoose = require("mongoose");
 const { uploadFile } = require("../middleware/AWS");
 // const Product = require("../models/products/product")
-const Inventory = require("../models/products/variantInventory")
+const VariantInventory = require("../models/products/variantInventory")
 const Variant = require("../models/products/variant")
 
+const SizeVariant = require("../models/products/sizeVariant")
+const SizeVariantInventory = require("../models/products/sizeVariantInventory")
 
 module.exports.AddProduct = async function (req, res) {
   try {
@@ -532,61 +534,479 @@ module.exports.getProductByIdWithRating = async function (req, res) {
 module.exports.addFoodsAndBeveragesProduct = async (req, res) => {
   try {
     const data = req.body;
+    // console.log(data)
 
+    if (!req.seller) {
+      return res.status(400).send({ success: false, message: "Seller not found" })
+    }
+
+    // DUE: Data validation  - first before saving
+
+    let newProduct = new productModel({
+      product_name: data.product_name,
+      product_description: data.product_description,
+
+      product_type: data.product_type,
+      unit_of_measurement: data.unit_of_measurement,
+
+      seller_id: req.seller._id,
+
+      generic_name: data.generic_name,
+      pack_of: data.pack_of,
+      quantity_type: data.quantity_type,
+      model_name: data.model_name,
+      type: data.type,
+      brand_name: data.brand_name,
+      country_of_origin: data.country_of_origin,
+      inventory_location: data.inventory_location,
+      storage_conditions: data.storage_conditions
+    })
+
+    // console.log(newProduct)
+
+    let savedProduct = await newProduct.save();
+
+    for (let i = 0; i < data.variants.length; i++) {
+      // console.log(data.variants[i])
+
+      let newVariant = new Variant({
+        product_id: savedProduct._id,
+        actual_price: data.variants[i].actual_price,
+        offered_price: data.variants[i].offered_price,
+        min_order_quantity: data.variants[i].min_order_quantity,
+        manufactured_date: data.variants[i].manufactured_date,
+        expiration_date: data.variants[i].expiration_date,
+        calories: data.variants[i].calories,
+        packaging_type: data.variants[i].packaging_type,
+      })
+      if (data.quantity_type === "weight") {
+        newVariant.weight_per_unit = data.variants[i].weight_per_unit,
+          newVariant.unit_of_weight = data.variants[i].unit_of_weight
+
+      } else if (data.quantity_type === "volume") {
+        newVariant.volume_per_unit = data.variants[i].volume_per_unit,
+          newVariant.unit_of_volume = data.variants[i].unit_of_volume
+      }
+      // console.log(newVariant)
+
+      // Save new variant to the db
+      const savedVariant = await newVariant.save();
+
+      let newVariantInventory = new VariantInventory({
+        product_variant_id: savedVariant._id,
+        available_quantity: data.variants[i].quantity
+      })
+
+      // console.log(newVariantInventory)
+      let savedInventory = await newVariantInventory.save();
+    }
+
+
+    return res.status(201).send({ success: true, message: "Product added successfully" });
+  } catch (err) {
+    console.log("Error while adding food and beverage product", err);
+    return res.status(500).send({ success: false, message: "Internal server error" });
+  }
+}
+
+module.exports.addClothingsProduct = async (req, res) => {
+  try {
+    const data = req.body;
+    // console.log(data)
+    // DUE: Data validation 
+
+    if (!req.seller) {
+      return res.status(400).send({ success: false, message: "Seller not found" })
+    }
+
+    let newProduct = new productModel({
+      product_name: data.product_name,
+      product_description: data.product_description,
+
+      product_type: data.product_type,
+      unit_of_measurement: data.unit_of_measurement,
+
+      seller_id: req.seller._id,
+
+      generic_name: data.generic_name,
+      pack_of: data.pack_of,
+      fit: data.fit,
+      fabric: data.fabric,
+      fabric_care: data.fabric_care,
+      suitable_for: data.suitable_for,
+      brand_name: data.brand_name,
+      country_of_origin: data.country_of_origin,
+      ideal_for: data.ideal_for,
+      is_returnable: data.is_returnable,
+      return_within_days: data.return_within_days,
+      returnable_condition: data.returnable_condition,
+      min_order_quantity: data.min_order_quantity,
+      inventory_location: data.inventory_location,
+    })
+
+    if (data.generic_name === "Casual Shirts" ||
+      data.generic_name === "Formal Shirts" ||
+      data.generic_name === "T-Shirts") {
+      newProduct.sleeve = data.sleeve,
+        newProduct.pattern = data.pattern,
+        newProduct.reversible = data.reversible
+    }
+
+    if (data.generic_name === "Casual Shirts" ||
+      data.generic_name === "Formal Shirts") {
+      newProduct.closure = data.closure,
+        newProduct.collar = data.collar,
+        newProduct.hem = data.hem
+    }
+
+    if (data.generic_name === "T-Shirts") {
+      newProduct.neck_type = data.neck_type
+    }
+
+    // save product info to db
+    const savedProduct = await newProduct.save();
+
+    for (let i = 0; i < data.variants.length; i++) {
+      // console.log(data.variants[i])
+
+      let newVariant = new Variant({
+        product_id: savedProduct._id,
+        primary_color: data.variants[i].primary_color,
+        secondary_color: data.variants[i].secondary_color,
+      })
+
+      // Save new variant to the db
+      const savedVariant = await newVariant.save();
+
+      // sizes and their details of a variant
+      const sizeVariants = data.variants[i].size_variants
+
+      for (let j = 0; j < sizeVariants.length; j++) {
+        // console.log(sizeVariants[j])
+
+        const newSizeVariant = new SizeVariant({
+          product_variant_id: savedVariant._id,
+          size: sizeVariants[j].size,
+          actual_price: sizeVariants[j].actual_price,
+          offered_price: sizeVariants[j].offered_price,
+        })
+
+        // save size variant to db
+        const savedSizeVariant = await newSizeVariant.save();
+
+
+        const newSizeVariantInventory = new SizeVariantInventory({
+          size_variant_id: savedSizeVariant._id,
+          available_quantity: sizeVariants[j].quantity,
+        })
+
+        // save size variant inventry to db
+        const savedSizeVariantInventory = await newSizeVariantInventory.save();
+      }
+    }
+
+    return res.status(201).send({ success: true, message: "Product added successfully" });
+  } catch (err) {
+    console.log("Error while adding clothings product", err);
+    return res.status(500).send({ success: false, message: "Internal server error" });
+  }
+}
+
+module.exports.addDefaultProduct = async (req, res) => {
+  try {
+    const data = req.body;
+    if (!req.seller) {
+      return res.status(400).send({ success: false, message: "Seller not found" })
+    }
+    // DUE: Data validation  - first before saving
+
+    let newProduct = new productModel({
+      product_name: data.product_name,
+      product_description: data.product_description,
+
+      product_type: data.product_type,
+
+      seller_id: req.seller._id,
+
+      generic_name: data.generic_name,
+      inventory_location: data.inventory_location,
+      quantity_type: data.quantity_type,
+      model_name: data.model_name,
+      type: data.type,
+      specifications: data.specifications,
+      brand_name: data.brand_name,
+      country_of_origin: data.country_of_origin,
+    })
+
+    // console.log(newProduct)
+
+    let savedProduct = await newProduct.save();
+
+    for (let i = 0; i < data.variants.length; i++) {
+      // console.log(data.variants[i])
+
+      let newVariant = new Variant({
+        product_id: savedProduct._id,
+        actual_price: data.variants[i].actual_price,
+        offered_price: data.variants[i].offered_price,
+        min_order_quantity: data.variants[i].min_order_quantity,
+      })
+
+      // console.log(newVariant)
+
+      // Save new variant to the db
+      const savedVariant = await newVariant.save();
+
+      let newVariantInventory = new VariantInventory({
+        product_variant_id: savedVariant._id,
+        available_quantity: data.variants[i].quantity
+      })
+
+      // console.log(newVariantInventory)
+      let savedInventory = await newVariantInventory.save();
+    }
+
+    return res.status(201).send({ success: true, message: "Product added successfully" });
+  } catch (err) {
+    console.log("Error while adding clothings product", err);
+    return res.status(500).send({ success: false, message: "Internal server error" });
+  }
+}
+
+module.exports.addDefaultAdminProduct = async (req, res) => {
+  try {
+    const data = req.body;
+
+    // DUE: Data validation  - first before saving
+
+    let newProduct = new productModel({
+      product_name: data.product_name,
+      product_description: data.product_description,
+
+      product_type: data.product_type,
+
+      is_admin_product: true,
+      admin_id: req.admin._id,
+      isApproved: true,
+
+      generic_name: data.generic_name,
+      inventory_location: data.inventory_location,
+      quantity_type: data.quantity_type,
+      model_name: data.model_name,
+      type: data.type,
+      specifications: data.specifications,
+      brand_name: data.brand_name,
+      country_of_origin: data.country_of_origin,
+    })
+
+    // console.log(newProduct)
+
+    let savedProduct = await newProduct.save();
+
+    for (let i = 0; i < data.variants.length; i++) {
+      // console.log(data.variants[i])
+
+      let newVariant = new Variant({
+        product_id: savedProduct._id,
+        actual_price: data.variants[i].actual_price,
+        offered_price: data.variants[i].offered_price,
+        min_order_quantity: data.variants[i].min_order_quantity,
+      })
+
+      // console.log(newVariant)
+
+      // Save new variant to the db
+      const savedVariant = await newVariant.save();
+
+      let newVariantInventory = new VariantInventory({
+        product_variant_id: savedVariant._id,
+        available_quantity: data.variants[i].quantity
+      })
+
+      // console.log(newVariantInventory)
+      let savedInventory = await newVariantInventory.save();
+    }
+
+    return res.status(201).send({ success: true, message: "Product added successfully" });
+  } catch (err) {
+    console.log("Error while adding clothings product", err);
+    return res.status(500).send({ success: false, message: "Internal server error" });
+  }
+}
+
+module.exports.addFoodsAndBeveragesAdminProduct = async (req, res) => {
+  try {
+    const data = req.body;
+    // console.log(data)
+
+    // DUE: Data validation  - first before saving
+
+    let newProduct = new productModel({
+      product_name: data.product_name,
+      product_description: data.product_description,
+
+      product_type: data.product_type,
+      unit_of_measurement: data.unit_of_measurement,
+
+      is_admin_product: true,
+      admin_id: req.admin._id,
+      isApproved: true,
+
+      generic_name: data.generic_name,
+      pack_of: data.pack_of,
+      quantity_type: data.quantity_type,
+      model_name: data.model_name,
+      type: data.type,
+      brand_name: data.brand_name,
+      country_of_origin: data.country_of_origin,
+      inventory_location: data.inventory_location,
+      storage_conditions: data.storage_conditions
+    })
+
+    // console.log(newProduct)
+
+    let savedProduct = await newProduct.save();
+
+    for (let i = 0; i < data.variants.length; i++) {
+      // console.log(data.variants[i])
+
+      let newVariant = new Variant({
+        product_id: savedProduct._id,
+        actual_price: data.variants[i].actual_price,
+        offered_price: data.variants[i].offered_price,
+        min_order_quantity: data.variants[i].min_order_quantity,
+        manufactured_date: data.variants[i].manufactured_date,
+        expiration_date: data.variants[i].expiration_date,
+        calories: data.variants[i].calories,
+        packaging_type: data.variants[i].packaging_type,
+      })
+      if (data.quantity_type === "weight") {
+        newVariant.weight_per_unit = data.variants[i].weight_per_unit,
+          newVariant.unit_of_weight = data.variants[i].unit_of_weight
+
+      } else if (data.quantity_type === "volume") {
+        newVariant.volume_per_unit = data.variants[i].volume_per_unit,
+          newVariant.unit_of_volume = data.variants[i].unit_of_volume
+      }
+      // console.log(newVariant)
+
+      // Save new variant to the db
+      const savedVariant = await newVariant.save();
+
+      let newVariantInventory = new VariantInventory({
+        product_variant_id: savedVariant._id,
+        available_quantity: data.variants[i].quantity
+      })
+
+      // console.log(newVariantInventory)
+      let savedInventory = await newVariantInventory.save();
+    }
+
+
+    return res.status(201).send({ success: true, message: "Product added successfully" });
+  } catch (err) {
+    console.log("Error while adding food and beverage product", err);
+    return res.status(500).send({ success: false, message: "Internal server error" });
+  }
+}
+
+module.exports.addClothingsAdminProduct = async (req, res) => {
+  try {
+    const data = req.body;
+    // console.log(data)
     // DUE: Data validation 
 
     let newProduct = new productModel({
       product_name: data.product_name,
       product_description: data.product_description,
 
+      product_type: data.product_type,
       unit_of_measurement: data.unit_of_measurement,
 
-      product_type: data.product_type,
-      seller_id: req.seller._id,
+      is_admin_product: true,
+      admin_id: req.admin._id,
+      isApproved: true,
 
-    })
-
-    let savedProduct = await newProduct.save();
-
-    let newVariant = new Variant({
-      product_id: savedProduct._id,
-      actual_price: Number(data.actual_price),
-      offered_price: Number(data.offered_price),
-      min_order_quantity: Number(data.min_order_quantity),
-
-      manufactured_date: data.manufactured_date,
-      expiration_date: data.expiration_date,
-      calories: Number(data.calories),
-      country_of_origin: data.country_of_origin,
-
-      packaging_type: data.packaging_type,
+      generic_name: data.generic_name,
+      pack_of: data.pack_of,
+      fit: data.fit,
+      fabric: data.fabric,
+      fabric_care: data.fabric_care,
+      suitable_for: data.suitable_for,
       brand_name: data.brand_name,
-      storage_conditions: data.storage_conditions,
-
-      quantity_type: data.quantity_type
+      country_of_origin: data.country_of_origin,
+      ideal_for: data.ideal_for,
+      is_returnable: data.is_returnable,
+      return_within_days: data.return_within_days,
+      returnable_condition: data.returnable_condition,
+      min_order_quantity: data.min_order_quantity,
+      inventory_location: data.inventory_location,
     })
 
-    if (data.quantity_type === "weight") {
-      newVariant.unit_of_weight = data.unit_of_weight,
-        newVariant.weight_per_unit = Number(data.weight_per_unit)
-    } else if (data.quantity_type === "volume") {
-      newVariant.unit_of_volume = data.unit_of_volume,
-        newVariant.volume_per_unit = Number(data.volume_per_unit)
+    if (data.generic_name === "Casual Shirts" ||
+      data.generic_name === "Formal Shirts" ||
+      data.generic_name === "T-Shirts") {
+      newProduct.sleeve = data.sleeve,
+        newProduct.pattern = data.pattern,
+        newProduct.reversible = data.reversible
     }
 
-    let savedVariant = await newVariant.save();
+    if (data.generic_name === "Casual Shirts" ||
+      data.generic_name === "Formal Shirts") {
+      newProduct.closure = data.closure,
+        newProduct.collar = data.collar,
+        newProduct.hem = data.hem
+    }
 
-    let newInventory = new Inventory({
-      available_quantity: Number(data.quantity),
-      inventory_location: data.inventory_location,
-      product_variant_id: savedVariant._id
-    })
+    if (data.generic_name === "T-Shirts") {
+      newProduct.neck_type = data.neck_type
+    }
 
-    let savedInventory = await newInventory.save();
+    // save product info to db
+    const savedProduct = await newProduct.save();
 
-    return res.status(201).send({ success: true, message: "Product added successfully", saved_product: savedProduct, saved_variant: savedVariant, saved_inventory: savedInventory });
+    for (let i = 0; i < data.variants.length; i++) {
+      // console.log(data.variants[i])
+
+      let newVariant = new Variant({
+        product_id: savedProduct._id,
+        primary_color: data.variants[i].primary_color,
+        secondary_color: data.variants[i].secondary_color,
+      })
+
+      // Save new variant to the db
+      const savedVariant = await newVariant.save();
+
+      // sizes and their details of a variant
+      const sizeVariants = data.variants[i].size_variants
+
+      for (let j = 0; j < sizeVariants.length; j++) {
+        // console.log(sizeVariants[j])
+
+        const newSizeVariant = new SizeVariant({
+          product_variant_id: savedVariant._id,
+          size: sizeVariants[j].size,
+          actual_price: sizeVariants[j].actual_price,
+          offered_price: sizeVariants[j].offered_price,
+        })
+
+        // save size variant to db
+        const savedSizeVariant = await newSizeVariant.save();
+
+
+        const newSizeVariantInventory = new SizeVariantInventory({
+          size_variant_id: savedSizeVariant._id,
+          available_quantity: sizeVariants[j].quantity,
+        })
+
+        // save size variant inventry to db
+        const savedSizeVariantInventory = await newSizeVariantInventory.save();
+      }
+    }
+
+    return res.status(201).send({ success: true, message: "Product added successfully" });
   } catch (err) {
-    console.log("Error while adding food and beverage product", err);
+    console.log("Error while adding clothings product", err);
     return res.status(500).send({ success: false, message: "Internal server error" });
   }
 }

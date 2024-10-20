@@ -26,23 +26,23 @@ const ProductList = () => {
   };
 
   const fetchData = async () => {
-    try {
-      const response = await axios(
-        `${import.meta.env.VITE_BACKEND_URL}/app/product/searchProducts`
-      );
+    // try {
+    //   const response = await axios(
+    //     `${import.meta.env.VITE_BACKEND_URL}/app/product/searchProducts`
+    //   );
 
-      console.log(response.data.result);
-      console.log(
-        `${import.meta.env.VITE_BACKEND_URL}/app/product/searchProducts`
-      );
-      setProducts(() => response.data.result);
-      setIsLoading(false);
-    } catch (error) {
-      console.log(
-        `${import.meta.env.VITE_BACKEND_URL}/app/product/searchProducts`
-      );
-      console.error("Error fetching data:", error);
-    }
+    //   console.log(response.data.result);
+    //   console.log(
+    //     `${import.meta.env.VITE_BACKEND_URL}/app/product/searchProducts`
+    //   );
+    //   setProducts(() => response.data.result);
+    //   setIsLoading(false);
+    // } catch (error) {
+    //   console.log(
+    //     `${import.meta.env.VITE_BACKEND_URL}/app/product/searchProducts`
+    //   );
+    //   console.error("Error fetching data:", error);
+    // }
   };
 
   const sortProducts = () => {

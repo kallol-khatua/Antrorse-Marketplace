@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 
 import Emptycart from "./emptycart";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   decrementQuantity,
@@ -12,9 +12,12 @@ import {
   clearCart,
 } from "../../redux/features/Cart/CartSlice";
 import axios from "axios";
+import UserAxiosInstance from "../../UserAxiosInstance";
 
 // Functional component for the shopping cart page
 const CartPage = () => {
+  const isUserLoggedIn = useSelector((state) => state.user.authorized);
+
   // State for managing the products in the cart
   const isLoggedIn = localStorage.getItem("user") === "true";
   const [taxpercent, setTaxpercent] = useState(15);
@@ -24,6 +27,13 @@ const CartPage = () => {
   const quantitiesInCart = useSelector((state) => state.cart.quantities);
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!isUserLoggedIn) {
+      navigate("/login");
+    }
+  }, [isUserLoggedIn, navigate]);
 
   const increment = (productId) => {
     console.log(productId);
@@ -111,23 +121,15 @@ const CartPage = () => {
   };
 
   const fetchCartData = async () => {
-    const response = await axios.get(
-      `${import.meta.env.VITE_BACKEND_URL}/app/cart/getCartData`,
-      {
-        headers: {
-          token: localStorage.getItem("authToken"),
-        },
-      }
-    );
-
-    setCartItems(response.data.result);
-    console.log(cartItems);
+    const response = await UserAxiosInstance.get("/cart/get-cart-items");
+    console.log(response.data);
+    setCartItems(response?.data?.cartItems);
+    // console.log(cartItems);
   };
 
   useEffect(() => {
     fetchCartData();
   }, []);
-  // JSX code for the shopping cart page
 
   return cartItems.length === 0 ? (
     <Emptycart />
@@ -141,7 +143,7 @@ const CartPage = () => {
 
           <button
             className="bg-slate-300 font-bold px-4 py-1 text-md rounded-md"
-            onClick={() => handleClearCart(cartItems[0]._id)}
+            // onClick={() => handleClearCart(cartItems[0]._id)}
           >
             Clear items from cart
           </button>
@@ -165,10 +167,9 @@ const CartPage = () => {
                 </thead>
 
                 {/* Table body - mapping through products */}
-                <tbody>
+                {/* <tbody>
                   {cartItems?.map((product) => (
                     <tr key={product._id}>
-                      {/* Product details */}
                       {console.log(product)}
                       <td className="py-4 ">
                         <div className="flex items-center">
@@ -198,7 +199,6 @@ const CartPage = () => {
                             </p>
                           </div>
                           <div>
-                            {/* Remove product button */}
                             <p
                               className="text-xs leading-3 underline text-red-500 pr-5 cursor-pointer"
                               onClick={() =>
@@ -210,12 +210,7 @@ const CartPage = () => {
                           </div>
                         </div>
                       </td>
-                      {/* <td className="py-4 text-sm  text-gray-500">
-                        {product.productDetails.variations?.brand_name ||
-                          "seller info unavailable"}
-                      </td> */}
 
-                      {/* Price, Quantity, and Total */}
                       <td className="py-4">₹{product.productDetails?.price}</td>
                       <td className="py-4">
                         <div className="flex items-center">
@@ -230,11 +225,6 @@ const CartPage = () => {
                             onClick={() =>
                               decrement(product.productDetails._id)
                             }
-                            // disabled={
-                            //   quantitiesInCart.find(
-                            //     (item) => item.id === product.productDetails._id
-                            //   )?.quantity === 1
-                            // }
                           >
                             -
                           </button>
@@ -286,7 +276,7 @@ const CartPage = () => {
                       </td>
                     </tr>
                   ))}
-                </tbody>
+                </tbody> */}
               </table>
             </div>
           </div>
@@ -298,21 +288,21 @@ const CartPage = () => {
             {/* Summary details */}
             <h2 className="text-lg font-semibold mb-4">Summary</h2>
             <div className="flex justify-between mb-2">
-              <span>Subtotal</span>
+              <span>Price</span>
+              {/* <span>₹{calculateSubtotal()}</span> */}
+            </div>
+            <div className="flex justify-between mb-2">
+              <span>Discount</span>
+              {/* <span>₹{calculateSubtotal()}</span> */}
+            </div>
+            {/* <div className="flex justify-between mb-2">
+              <span>Delivery Charges</span>
               <span>₹{calculateSubtotal()}</span>
-            </div>
-            <div className="flex justify-between mb-2">
-              <span>GST</span>
-              <span>₹{tax(calculateSubtotal())}</span>
-            </div>
-            <div className="flex justify-between mb-2">
-              <span>Shipping</span>
-              <span>₹0.00</span>
-            </div>
+            </div> */}
             <hr className="my-2" />
 
             {/* Promo code input */}
-            <div>
+            {/* <div>
               <span className="font-bold"> Apply Promo code</span>
               <div className="flex gap-4">
                 <input
@@ -324,16 +314,16 @@ const CartPage = () => {
                   Apply
                 </span>
               </div>
-            </div>
-            <hr className="my-2" />
+            </div> */}
+            {/* <hr className="my-2" /> */}
 
             {/* Total and Checkout button */}
             <div className="flex justify-between mb-4">
-              <span className="font-semibold">Total</span>
+              <span className="font-semibold">Total Amount</span>
               <span className="font-semibold">
                 ₹
-                {parseInt(calculateSubtotal()) +
-                  parseInt(tax(calculateSubtotal()))}{" "}
+                {/* {parseInt(calculateSubtotal()) +
+                  parseInt(tax(calculateSubtotal()))}{" "} */}
                 {/* Taxes */}
               </span>
             </div>

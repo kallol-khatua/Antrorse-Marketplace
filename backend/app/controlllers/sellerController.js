@@ -84,9 +84,8 @@ module.exports.sellerRegistration = async function (req, res) {
     });
 
     let registeredSeller = await newSeller.save();
-    let authToken = registeredSeller.generateAuthToken();
 
-    return res.status(201).send({ success: true, message: "Account created successfully", registeredSeller, authToken });
+    return res.status(201).send({ success: true, message: "Account created successfully" });
   } catch (err) {
     console.log("Error while creating new seller account", err);
     return res.status(500).send({ success: false, message: "Internal server error" });
@@ -102,21 +101,13 @@ module.exports.sellerLogin = async function (req, res) {
     if (!data.mobile_number) {
       return res.status(400).send({ success: false, message: "Mobile number is required" })
     }
-    if (
-      !validation.isValidMobileNumber(data.mobile_number)
-    ) {
-      return res.status(400).send({ success: false, message: ErrorMessage.PHONE_EMPTY })
-    }
+
     let seller = await sellerModel.findOne({
       mobile_number: data.mobile_number,
     });
 
     if (!seller) {
       return res.status(400).send({ success: false, message: "Invalid mobile number" })
-    }
-
-    if (!seller.isActive) {
-      return res.status(400).send({ success: false, message: "Account is not active" })
     }
 
     if (!seller.isMobileNumberVerified) {
@@ -130,6 +121,10 @@ module.exports.sellerLogin = async function (req, res) {
     const matchPass = await bcrypt.compare(data.password, seller.password);
     if (!matchPass) {
       return res.status(400).send({ message: 'Invalid password.' });
+    }
+
+    if (!seller.isActive || !seller.isApproved) {
+      return res.status(400).send({ success: false, message: "Account is not active" })
     }
 
     let authToken = seller.generateAuthToken();

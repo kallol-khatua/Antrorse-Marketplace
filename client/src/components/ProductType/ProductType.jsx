@@ -1,97 +1,29 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
-import React, { useState } from "react";
-// import Model from './Model';
-import Model from "./Model";
+import { useState } from "react";
 import { CiMobile3 } from "react-icons/ci";
-import { MdLaptopMac } from "react-icons/md";
-import { IoShirtOutline, IoWatchOutline } from "react-icons/io5";
-import { IoMdCloseCircle } from "react-icons/io";
-import { MdLocalGroceryStore } from "react-icons/md";
-import { FaPlus } from "react-icons/fa6";
 
 import ClothingForm from "./ClothingForm";
 import ElectronicsForm from "./ElectronicsForm";
-// import DefaultForm from "./Defaultform";
+import DefaultForm from "./Defaultform";
 // import GroceryForm from "./GroceryForm";
 import FoodsAndBeverages from "./FoodsAndBeverages";
-
-// ProductType.jsx
-
-// ... (import statements)
+import Footwears from "./Footwears";
 
 const ProductType = () => {
-  const [category, setCategory] = useState({});
-  const [basicProductInfo, setBasicProductInfo] = useState({
-    product_name: "",
-    description: "",
-    quantity: "",
-    min_order_quantity: "",
-    actual_price: "",
-    offered_price: "",
-    unit_of_measurement: "piece",
-    location: "",
-  });
-
-  const handleVariation = (type, value) => {
-    setBasicProductInfo((prev) => ({
-      ...prev,
-    }));
-  };
-
-  const resetProduct = () => {
-    setBasicProductInfo({
-      product_name: "",
-      description: "",
-      quantity: "",
-      min_order_quantity: "",
-      actual_price: "",
-      offered_price: "",
-      unit_of_measurement: "piece",
-      location: "",
-    });
-  };
-
-  const handleSubmit = (e) => {
-    console.log(basicProductInfo);
-    e.preventDefault();
-    console.log("Product:", product);
-  };
-  const handleAddProductCategory = (newCategory) => {
-    setCategory(newCategory);
-  };
-  const handleDelete = () => {
-    setCategory(() => category.pop());
-  };
-
   const [selectedCategory, setSelectedCategory] = useState("Foods & Beverages");
 
   const handleCategoryClick = (category) => {
     setSelectedCategory(category);
   };
 
-  const [product, setProduct] = useState({
-    description: "",
-    tags: [],
-    coverimage: "",
-    photos: [],
-  });
-
   const [productCategories, setProductCategories] = useState([
     "Foods & Beverages",
     "Clothings",
-    "Footwears",
-    "Electronics",
+    // "Footwears",
+    // "Electronics",
+    "Default",
   ]);
-
-  // const handleVariation = (e) => {
-  //   const { name, value } = e.target;
-  //   setProduct((prevProduct) => ({
-  //     ...prevProduct,
-  //     [name]: value,
-  //   }));
-  // };
-
-  const handleChange = () => {};
 
   return (
     <div className="w-full">
@@ -130,19 +62,11 @@ const ProductType = () => {
           <div>
             {selectedCategory === "Foods & Beverages" && <FoodsAndBeverages />}
 
-            {selectedCategory === "Electronics" && (
-              <ElectronicsForm
-                product={product}
-                handleVariation={handleVariation}
-              />
-            )}
+            {selectedCategory === "Clothings" && <ClothingForm />}
 
-            {selectedCategory === "Clothings" && (
-              <ClothingForm
-                product={product}
-                handleVariation={handleVariation}
-              />
-            )}
+            {/* {selectedCategory === "Footwears" && <Footwears />} */}
+
+            {/* {selectedCategory === "Electronics" && <ElectronicsForm />} */}
 
             {/* {selectedCategory === "Grocery" && (
               <GroceryForm
@@ -152,13 +76,7 @@ const ProductType = () => {
               />
             )} */}
 
-            {/* {selectedCategory === "default" && (
-              <DefaultForm
-                product={product}
-                handleChange={handleChange}
-                handleSubmit={handleSubmit}
-              />
-            )} */}
+            {selectedCategory === "Default" && <DefaultForm />}
           </div>
         </div>
       </div>

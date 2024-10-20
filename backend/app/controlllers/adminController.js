@@ -6,317 +6,353 @@ const { SuccessMessage, ErrorMessage } = require("../helper/message");
 const { ErrorCode, SuccessCode } = require("../helper/statusCode");
 const commonFunction = require("../helper/commonFunction");
 const orderModels = require("../models/orders/orderModels");
-const adminModel=require("../models/admin/admin")
-const jwt= require("jsonwebtoken")
-const bcrypt=require("bcrypt")
+const adminModel = require("../models/admin/admin")
+const jwt = require("jsonwebtoken")
+const bcrypt = require("bcrypt")
 
 require("dotenv").config()
-const userAddressModel=require("../models/user/userAddressModel")
+const userAddressModel = require("../models/user/userAddressModel")
 const validation = require("../helper/validation");
-module.exports = {
+const Admin = require("../models/admin/admin");
 
-  login: async function (req, res) {
-    try {
-      
-      let data = req.body;
-      let adminData;
-      if(!data.password){
-        return response.commonErrorResponse(
-          res,
-          ErrorCode.BAD_REQUEST,
-          {},
-          ErrorMessage.PASSWORD_REQUIRED)
-      }
-      if (!data.mobile_number) {
-        return response.commonErrorResponse(
-          res,
-          ErrorCode.BAD_REQUEST,
-          {},
-          ErrorMessage.PHONE_EMPTY
-        );
-      }
-      if (data.mobile_number) { 
-         adminData = await adminModel.findOne({mobile_number:data.mobile_number});
-        
-      } else {
-      
-        return response.commonErrorResponse(
-          res,
-          ErrorCode.BAD_REQUEST,
-          {},
-          ErrorMessage.NOT_FOUND
-        );
-      }
+module.exports.login = async function (req, res) {
+  try {
+    let data = req.body;
+    // console.log(data)
 
-      if (!adminData) {
+    if (!data.password) {
+      return res.status(400).send({ success: false, message: "Password is required" })
+    }
+
+    if (!data.mobile_number) {
+      return res.status(400).send({ success: false, message: "Mobile number is required" })
+    }
+
+    let admin = await Admin.findOne({
+      mobile_number: data.mobile_number,
+    });
+    // console.log(admin)
+    if (!admin) {
+      return res.status(400).send({ success: false, message: "Invalid mobile number" })
+    }
+
+    const matchPass = await bcrypt.compare(data.password, admin.password);
+    if (!matchPass) {
+      return res.status(400).send({ success: false, message: 'Invalid password.' });
+    }
+
+    let authToken = admin.generateAuthToken();
+
+    if (authToken) {
+      return res.status(200).send({ success: true, message: "Login successfully", authToken });
+    } else {
+      return res.status(400).send({ success: false, message: "Error while login" });
+    }
+  } catch (err) {
+    console.log("Error while login user", err);
+    return res.status(500).send({ success: false, message: "Internal server error" });
+  }
+}
+
+module.exports.totalUser = async function (req, res) {
+  try {
+    let totalUser = await userModel.find();
+    if (totalUser.length == 0) {
+      totalUser = await userModel.find();
+      if (totalUser.length == 0) {
         return response.commonErrorResponse(
           res,
           ErrorCode.NOT_FOUND,
-          {},
-          ErrorMessage.USER_NOT_FOUND
+          [],
+          ErrorMessage.NOT_FOUND
         );
       }
+    } else {
+      return response.commonResponse(
+        res,
+        SuccessCode.SUCCESS,
+        totalUser,
+        SuccessMessage.DATA_FOUND
+      );
+    }
+  } catch (err) {
+    return response.commonErrorResponse(
+      res,
+      ErrorCode.INTERNAL_ERROR,
+      {},
+      err.message
+    );
+  }
+}
 
-      const matchPass = await bcrypt.compare(data.password, adminData.password);
-
-      if (!matchPass) {
+module.exports.totalSeller = async function (req, res) {
+  try {
+    let totalSeller = await sellerModel.find();
+    if (totalSeller.length == 0) {
+      totalSeller = await sellerModel.find();
+      if (totalSeller.length == 0) {
         return response.commonErrorResponse(
           res,
-          ErrorCode.INVALID_CREDENTIAL,
-          {},
-          ErrorMessage.INVALID_CREDENTIAL
+          ErrorCode.NOT_FOUND,
+          [],
+          ErrorMessage.NOT_FOUND
         );
       }
+    } else {
+      return response.commonResponse(
+        res,
+        SuccessCode.SUCCESS,
+        totalSeller,
+        SuccessMessage.DATA_FOUND
+      );
+    }
+  } catch (err) {
+    return response.commonErrorResponse(
+      res,
+      ErrorCode.INTERNAL_ERROR,
+      {},
+      err.message
+    );
+  }
+}
 
-      let payLoad = {
-        admin_id: adminData._id.toString(),
-      };
-      let token = jwt.sign(payLoad, process.env.SECRET_KEY, {
-        expiresIn: "72h",
-      });
-      if (token) {
-        return response.commonResponse(
-          res,
-          SuccessCode.SUCCESS,
-          token,
-          SuccessMessage.LOGIN_SUCCESS
-        );
-      }
-    } catch (err) {
-      return response.commonErrorResponse(
-        res,
-        ErrorCode.INTERNAL_ERROR,
-        {},
-        err.message
-      );
-    }
-  },
-
-  totalUser: async function (req, res) {
-    try {
-      let totalUser = await userModel.find();
-      if (totalUser.length == 0) {
-        totalUser = await userModel.find();
-        if (totalUser.length == 0) {
-          return response.commonErrorResponse(
-            res,
-            ErrorCode.NOT_FOUND,
-            [],
-            ErrorMessage.NOT_FOUND
-          );
-        }
-      } else {
-        return response.commonResponse(
-          res,
-          SuccessCode.SUCCESS,
-          totalUser,
-          SuccessMessage.DATA_FOUND
-        );
-      }
-    } catch (err) {
-      return response.commonErrorResponse(
-        res,
-        ErrorCode.INTERNAL_ERROR,
-        {},
-        err.message
-      );
-    }
-  },
-  totalSeller: async function (req, res) {
-    try {
-      let totalSeller = await sellerModel.find();
-      if (totalSeller.length == 0) {
-        totalSeller = await sellerModel.find();
-        if (totalSeller.length == 0) {
-          return response.commonErrorResponse(
-            res,
-            ErrorCode.NOT_FOUND,
-            [],
-            ErrorMessage.NOT_FOUND
-          );
-        }
-      } else {
-        return response.commonResponse(
-          res,
-          SuccessCode.SUCCESS,
-          totalSeller,
-          SuccessMessage.DATA_FOUND
-        );
-      }
-    } catch (err) {
-      return response.commonErrorResponse(
-        res,
-        ErrorCode.INTERNAL_ERROR,
-        {},
-        err.message
-      );
-    }
-  },
-  totalProduct: async function (req, res) {
-    try {
-      let totalProduct = await productModel.find();
+module.exports.totalProduct = async function (req, res) {
+  try {
+    let totalProduct = await productModel.find();
+    if (totalProduct.length == 0) {
+      totalProduct = await productModel.find();
       if (totalProduct.length == 0) {
-        totalProduct = await productModel.find();
-        if (totalProduct.length == 0) {
-          return response.commonErrorResponse(
-            res,
-            ErrorCode.NOT_FOUND,
-            [],
-            ErrorMessage.NOT_FOUND
-          );
-        }
-      } else {
-        return response.commonResponse(
+        return response.commonErrorResponse(
           res,
-          SuccessCode.SUCCESS,
-          totalProduct,
-          SuccessMessage.DATA_FOUND
+          ErrorCode.NOT_FOUND,
+          [],
+          ErrorMessage.NOT_FOUND
         );
       }
-    } catch (err) {
-      return response.commonErrorResponse(
+    } else {
+      return response.commonResponse(
         res,
-        ErrorCode.INTERNAL_ERROR,
-        {},
-        err.message
+        SuccessCode.SUCCESS,
+        totalProduct,
+        SuccessMessage.DATA_FOUND
       );
     }
-  },
-  // Total sales worth
-  totalSalesWorth: async function (req, res) {
-    try {
-      const totalSalesWorth = await orderModel.aggregate([
-        {
-          $match: {
-            orderStatus: "completed",
-          },
-        },
-        {
-          $group: {
-            _id: null, // grouping all documents together
-            totalSales: { $sum: "$totalPrice" }, // calculating the sum of totalPrice field
-          },
-        },
-        {
-          $project: {
-            _id: 0, // excluding the _id field from the result
-            totalSales: 1, // including only the totalSales field in the result
-          },
-        },
-      ]);
-    } catch (err) {
-      return response.commonErrorResponse(
-        res,
-        ErrorCode.INTERNAL_ERROR,
-        {},
-        err.message
-      );
-    }
-  },
-  
-  //  this api for single seller==== total sale worth
-  totalSalesWorthOfSeller: async function () {
-    try {
-      let seller_id = req.seller_id;
-      let totalSale= await orderModels.aggregate([
-        {
-$unwind:"$orderItems"
-        },
-        {$lookup:{
-          from:"products",
-          localField:"orderItems.product_id",
-          foreignField:"_id",
-          as:productDetails
-        }}
-        ,{
-          $unwind:"$productDetails"
+  } catch (err) {
+    return response.commonErrorResponse(
+      res,
+      ErrorCode.INTERNAL_ERROR,
+      {},
+      err.message
+    );
+  }
+}
 
-          
+// Total sales worth
+module.exports.totalSalesWorth = async function (req, res) {
+  try {
+    const totalSalesWorth = await orderModel.aggregate([
+      {
+        $match: {
+          orderStatus: "completed",
         },
-        {
-          $match:{
-            "productDetails.seller_id": seller_id
-          }
+      },
+      {
+        $group: {
+          _id: null, // grouping all documents together
+          totalSales: { $sum: "$totalPrice" }, // calculating the sum of totalPrice field
         },
-        {
-          $addFields:{
-            totalPrice:{$sum:"$orderItems.price"}
-          }
+      },
+      {
+        $project: {
+          _id: 0, // excluding the _id field from the result
+          totalSales: 1, // including only the totalSales field in the result
+        },
+      },
+    ]);
+  } catch (err) {
+    return response.commonErrorResponse(
+      res,
+      ErrorCode.INTERNAL_ERROR,
+      {},
+      err.message
+    );
+  }
+}
+
+//  this api for single seller==== total sale worth
+module.exports.totalSalesWorthOfSeller = async function () {
+  try {
+    let seller_id = req.seller_id;
+    let totalSale = await orderModels.aggregate([
+      {
+        $unwind: "$orderItems"
+      },
+      {
+        $lookup: {
+          from: "products",
+          localField: "orderItems.product_id",
+          foreignField: "_id",
+          as: productDetails
         }
-        
-      ])
+      }
+      , {
+        $unwind: "$productDetails"
 
 
-    } catch (err) {
-      return response.commonErrorResponse(
-        res,
-        ErrorCode.INTERNAL_ERROR,
-        {},
-        err.message
-      );
-    }
-  },
-  //   this Api for seller
-  totalProductOfSingleSeller: async function (req, res) {
-    try {
-      let seller_id = req.seller_id;
+      },
+      {
+        $match: {
+          "productDetails.seller_id": seller_id
+        }
+      },
+      {
+        $addFields: {
+          totalPrice: { $sum: "$orderItems.price" }
+        }
+      }
 
-      let totalProduct = await productModel.find({ seller_id });
+    ])
+
+
+  } catch (err) {
+    return response.commonErrorResponse(
+      res,
+      ErrorCode.INTERNAL_ERROR,
+      {},
+      err.message
+    );
+  }
+}
+
+//   this Api for seller
+module.exports.totalProductOfSingleSeller = async function (req, res) {
+  try {
+    let seller_id = req.seller_id;
+
+    let totalProduct = await productModel.find({ seller_id });
+    if (totalProduct.length == 0) {
+      totalProduct = await productModel.find({ seller_id });
       if (totalProduct.length == 0) {
-        totalProduct = await productModel.find({ seller_id });
-        if (totalProduct.length == 0) {
-          return response.commonErrorResponse(
-            res,
-            ErrorCode.NOT_FOUND,
-            [],
-            ErrorMessage.NOT_FOUND
-          );
-        }
-      } else {
-        return response.commonResponse(
+        return response.commonErrorResponse(
           res,
-          SuccessCode.SUCCESS,
-          totalProduct,
-          SuccessMessage.DATA_FOUND
+          ErrorCode.NOT_FOUND,
+          [],
+          ErrorMessage.NOT_FOUND
         );
       }
-    } catch (err) {
-      return response.commonErrorResponse(
+    } else {
+      return response.commonResponse(
         res,
-        ErrorCode.INTERNAL_ERROR,
-        {},
-        err.message
+        SuccessCode.SUCCESS,
+        totalProduct,
+        SuccessMessage.DATA_FOUND
       );
     }
-  },
-  totalOrder: async function (req, res) {
-    try {
-      let totalOrder = await orderModels.find();
+  } catch (err) {
+    return response.commonErrorResponse(
+      res,
+      ErrorCode.INTERNAL_ERROR,
+      {},
+      err.message
+    );
+  }
+}
+
+module.exports.totalOrder = async function (req, res) {
+  try {
+    let totalOrder = await orderModels.find();
+    if (totalOrder.length == 0) {
+      totalOrder = await userModel.find();
       if (totalOrder.length == 0) {
-        totalOrder = await userModel.find();
-        if (totalOrder.length == 0) {
-          return response.commonErrorResponse(
-            res,
-            ErrorCode.NOT_FOUND,
-            [],
-            ErrorMessage.NOT_FOUND
-          );
-        }
-      } else {
-        return response.commonResponse(
+        return response.commonErrorResponse(
           res,
-          SuccessCode.SUCCESS,
-          totalOrder,
-          SuccessMessage.DATA_FOUND
+          ErrorCode.NOT_FOUND,
+          [],
+          ErrorMessage.NOT_FOUND
         );
       }
-    } catch (err) {
-      return response.commonErrorResponse(
+    } else {
+      return response.commonResponse(
         res,
-        ErrorCode.INTERNAL_ERROR,
-        {},
-        err.message
+        SuccessCode.SUCCESS,
+        totalOrder,
+        SuccessMessage.DATA_FOUND
       );
     }
-  },
-};
+  } catch (err) {
+    return response.commonErrorResponse(
+      res,
+      ErrorCode.INTERNAL_ERROR,
+      {},
+      err.message
+    );
+  }
+}
+
+module.exports.dueAuthorizationSeller = async (req, res) => {
+  try {
+    const sellers = await sellerModel.find({
+      isEmailVerified: true,
+      isMobileNumberVerified: true,
+      isActive: false,
+      isApproved: false,
+      isRejected: false
+    })
+    return res.status(200).send({ success: true, message: "Sellers found", sellers })
+  } catch (error) {
+    console.log("error while getting due authorization seller", error);
+    return res.status(500).send({ success: false, message: "Internal server error" })
+  }
+}
+
+module.exports.approveSeller = async (req, res) => {
+  try {
+    const seller = await sellerModel.findOne({ _id: req.body.sellerId })
+    if (!seller) {
+      return res.status(400).send({ success: false, message: "Seller not found" })
+    }
+
+    seller.isActive = true;
+    seller.isApproved = true;
+    seller.account_status = "ACTIVE";
+
+    await seller.save();
+
+    return res.status(200).send({ success: true, message: "Seller approved successfully" })
+  } catch (error) {
+    console.log("error while approving seller", error);
+    return res.status(500).send({ success: false, message: "Internal server error" })
+  }
+}
+
+module.exports.rejectSeller = async (req, res) => {
+  try {
+    const seller = await sellerModel.findOne({ _id: req.body.sellerId })
+    if (!seller) {
+      return res.status(400).send({ success: false, message: "Seller not found" })
+    }
+
+    seller.isRejected = true;
+    seller.account_status = "REJECTED";
+
+    await seller.save();
+
+    return res.status(200).send({ success: true, message: "Seller rejected successfully" })
+  } catch (error) {
+    console.log("error while rejecting seller", error);
+    return res.status(500).send({ success: false, message: "Internal server error" })
+  }
+}
+
+module.exports.getProductForApproval = async (req, res) => {
+  try {
+    const products = await productModel.find({
+      isApproved: false,
+      isRejected: false
+    })
+    return res.status(200).send({ success: true, message: "product found", products });
+  } catch (error) {
+    console.log("Error while getting products for approval", error);
+    return res.status(500).send({ success: false, message: "Internal server error" })
+  }
+}

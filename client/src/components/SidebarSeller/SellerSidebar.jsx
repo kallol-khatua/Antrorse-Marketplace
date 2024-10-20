@@ -132,7 +132,7 @@ const SellerSidebar = () => {
                 {/* <!-- Menu Item seller end --> */}
 
                 {/* <!-- Menu Item Profile --> */}
-                <NavLink
+                {/* <NavLink
                   to="/seller/profile"
                   className={`group cursor-pointer relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-gray-200 duration-300 ease-in-out hover:bg-teal-800 dark:hover:bg-gray-600-4 text-lg   `}
                 >
@@ -154,7 +154,7 @@ const SellerSidebar = () => {
                     />
                   </svg>
                   Profile
-                </NavLink>
+                </NavLink> */}
                 {/* <!-- Menu Item Profile --> */}
 
                 {/* <!-- Menu Item addproduct --> */}
@@ -278,7 +278,7 @@ const SellerSidebar = () => {
                 {/* <!-- Menu Item Tables --> */}
 
                 {/* <!-- Menu Item Settings --> */}
-                <NavLink
+                {/* <NavLink
                   to="/seller/settings"
                   className={`group cursor-pointer relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-gray-200 duration-300 ease-in-out hover:bg-teal-800 dark:hover:bg-gray-600-4 text-lg   `}
                 >
@@ -312,7 +312,7 @@ const SellerSidebar = () => {
                     </defs>
                   </svg>
                   Settings
-                </NavLink>
+                </NavLink> */}
                 {/* <!-- Menu Item Settings --> */}
                 {/* Menu Item Help & Support */}
                 {/* <SidebarLinkGroup>

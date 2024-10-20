@@ -6,8 +6,8 @@ import { Link } from "react-router-dom";
 import * as Yup from "yup";
 import { useFormik } from "formik";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import toast, { Toaster } from "react-hot-toast";
+import { useDispatch, useSelector } from "react-redux";
+import { toast } from "react-toastify";
 import { auth } from "../../redux/features/User/UserSlice";
 import axios from "axios";
 import { setSellerAuth } from "../../redux/features/Seller/SellerSclice";
@@ -44,6 +44,7 @@ const SellerLogin = () => {
           const response = await axios.post(url, values);
           // console.log(response);
           if (response.status === 200) {
+            toast.success(response.data.message);
             dispatch(setSellerAuth(true));
             localStorage.setItem("isAuthorizedSeller", JSON.stringify(true));
             localStorage.setItem(
@@ -52,9 +53,12 @@ const SellerLogin = () => {
               response.data.authToken
             );
             navigate("/seller/dashboard", { replace: true });
-            window.location.reload();
+            // window.location.reload();
           }
         } catch (error) {
+          if (error.response.status === 400) {
+            toast.error(error?.response?.data?.message);
+          }
           console.error("Error while login");
         }
       },
@@ -67,6 +71,13 @@ const SellerLogin = () => {
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
   }, []);
+
+  const isSellerLoggedIn = useSelector((state) => state.seller.authorized);
+  useEffect(() => {
+    if (isSellerLoggedIn) {
+      navigate("/seller/dashboard");
+    }
+  }, [isSellerLoggedIn, navigate]);
 
   return (
     <div className="bg-gray-50   flex-1  ">
@@ -208,7 +219,7 @@ const SellerLogin = () => {
                 </div>
               </div> */}
 
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-3">
                 <button
                   type="submit"
                   className="w-[50%] text-slate-200 bg-red-500 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-md text-sm px-5 py-2.5 text-center"
@@ -217,7 +228,7 @@ const SellerLogin = () => {
                 </button>
                 <button
                   type="submit"
-                  className="  w-[20%] text-black bg-gray-200  focus:ring-3 focus:outline-none focus:ring-primary-300 font-medium rounded-md text-sm px-5 py-2.5 "
+                  className="  w-[50%] text-black bg-gray-200  focus:ring-3 focus:outline-none focus:ring-primary-300 font-medium rounded-md text-sm px-5 py-2.5 "
                   onClick={handleCancel}
                 >
                   cancel
@@ -289,7 +300,6 @@ const SellerLogin = () => {
           </div> */}
         </div>
       </div>
-      <Toaster position="top-center" containerStyle={{ top: "8rem" }} />
     </div>
   );
 };

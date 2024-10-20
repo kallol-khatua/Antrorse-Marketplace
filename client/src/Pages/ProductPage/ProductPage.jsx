@@ -104,21 +104,21 @@ const ProductPage = () => {
                   <h2 className="max-w-xl mt-6 mb-6 text-xl font-semibold leading-loose tracking-wide  md:text-2xl ">
                     Men Solid Bomber Jacket
                   </h2>
-                  <div className="flex flex-wrap items-center mb-6">
+                  {/* <div className="flex flex-wrap items-center mb-6">
                     <StarRating rating={4} />
                     <span>(123)</span>
-                  </div>
+                  </div> */} 
                   <p className="inline-block text-2xl font-semibold text-red-800  ">
                     <span>Rs 1200</span>
                     <span className="ml-3 text-base font-normal text-gray-500 line-through ">
                       Rs 10,000
                     </span>
                   </p>
-                  <p className="pt-2 text-gray-500">
+                  {/* <p className="pt-2 text-gray-500">
                     Lorem ipsum dolor sit amet consectetur adipisicing elit. Et,
                     minima aperiam dolore nam quos ducimus, earum quod
                     laboriosam animi nulla expedita. Soluta, illum.
-                  </p>
+                  </p> */}
                 </div>
                 {/* <div className="mb-6">
                   <h2 className="mb-2 text-lg font-bold text-gray-700 ">
@@ -238,7 +238,7 @@ const ProductPage = () => {
                 </div> */}
 
                 <div className="mb-6 "></div>
-                <div className="flex flex-wrap items-center mb-6">
+                {/* <div className="flex flex-wrap items-center mb-6">
                   <h2 className="text-lg mr-3">Quantity :</h2>
                   <div className="mb-4 mr-4 lg:mb-0">
                     <div className="w-28">
@@ -268,7 +268,7 @@ const ProductPage = () => {
                   >
                     Add to cart
                   </a>
-                </div>
+                </div> */}
                 <div className="flex gap-4 mb-6">
                   <a
                     href="#"

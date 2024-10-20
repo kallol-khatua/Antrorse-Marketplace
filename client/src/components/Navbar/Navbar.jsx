@@ -30,6 +30,7 @@ const SubMenu = ({ items }) => (
 const Navbar = () => {
   const isUserLoggedIn = useSelector((state) => state.user.authorized);
   const isSellerLoggedIn = useSelector((state) => state.seller.authorized);
+ 
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const toggleMenu = () => {

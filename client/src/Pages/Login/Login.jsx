@@ -7,7 +7,7 @@ import * as Yup from "yup";
 import { useFormik } from "formik";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import toast, { Toaster } from "react-hot-toast";
+import { toast } from "react-toastify";
 import { auth } from "../../redux/features/User/UserSlice";
 import axios from "axios";
 import { setAuth } from "../../redux/features/User/UserSlice";
@@ -46,10 +46,8 @@ const Login = () => {
           if (response.status === 200) {
             dispatch(setAuth(true));
             localStorage.setItem("isAuthorizedUser", JSON.stringify(true));
-            localStorage.setItem(
-              "authToken",
-              JSON.stringify(response.data.authToken)
-            );
+            localStorage.setItem("authToken", response.data.authToken);
+            toast.success("Logged in successfuly");
             navigate(-1);
           }
         } catch (error) {
@@ -291,7 +289,6 @@ const Login = () => {
           </div> */}
         </div>
       </div>
-      <Toaster position="top-center" containerStyle={{ top: "8rem" }} />
     </div>
   );
 };

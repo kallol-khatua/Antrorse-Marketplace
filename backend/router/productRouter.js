@@ -68,6 +68,15 @@ route.get("/getProductBySubcategory", productController.getProductBySubcategory)
 route.put("/updateProduct/:product_id", auth.sellerAuth, productController.updateProduct)
 route.get("/getProductByIdWithRating/:product_id", productController.getProductByIdWithRating)
 
+
+route.get("/get-product-category", productController.getProductCategory)
+
+route.get("/get-clothing-order-detail", productController.getClothingOrderDetail)
+
+route.get("/get-seller-detail", productController.getSellerDetail)
+
+route.get("/get-default-order-detail", productController.getDefaultOrderDetail)
+
 // ===========productRating========
 
 // Create a new review and rating

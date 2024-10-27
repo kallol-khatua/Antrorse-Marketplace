@@ -10,5 +10,8 @@ const searchProductController = require("../app/controlllers/searchProductContro
 route.get("/clothing/shirts", searchProductController.getAllShirts)
 route.get("/clothing/shirts/view-details", searchProductController.getShirtDetails)
 
+route.get("/get-product", searchProductController.getProduct)
+route.get("/default/view-details", searchProductController.viewDefaultProductDetail)
+
 
 module.exports = route

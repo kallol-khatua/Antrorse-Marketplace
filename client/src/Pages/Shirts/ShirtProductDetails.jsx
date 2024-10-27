@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { IoHeartOutline } from "react-icons/io5";
 import StarRating from "../../components/StartRating/StartRating";
 import Ribbon from "../../utils/Ribbon/Ribbon";
@@ -168,6 +168,12 @@ const ShirtProductDetails = () => {
   };
 
   const handleBuynow = () => {
+    if (!isUserLoggedIn) {
+      navigate("/login");
+      toast.error("You are not logged in");
+      return;
+    }
+
     const productId = searchParams.get("productId");
     const variantId = searchParams.get("variantId");
     const size_variant_id = sizeVariant.sizeVariants._id;

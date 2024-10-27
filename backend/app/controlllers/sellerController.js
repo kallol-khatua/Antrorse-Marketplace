@@ -7,6 +7,11 @@ const validation = require("../helper/validation");
 const commonFunction = require("../helper/commonFunction");
 const bcrypt = require("bcrypt");
 const { uploadFile } = require("../middleware/AWS");
+const SellerPickupLocation = require("../models/seller/sellerPickupLocation");
+const { default: axios } = require("axios");
+const OrderItem = require("../models/orders/orderItem");
+const { default: mongoose } = require("mongoose");
+const ShiprocketDetail = require("../models/orders/shiprocketDetail");
 
 module.exports.sellerRegistration = async function (req, res) {
   try {
@@ -134,6 +139,65 @@ module.exports.sellerLogin = async function (req, res) {
     }
   } catch (err) {
     console.log("Error while login seller", err);
+    return res.status(500).send({ success: false, message: "Internal server error" });
+  }
+}
+
+module.exports.createPickupLocation = async (req, res) => {
+  try {
+    const {
+      pickup_location,
+      address,
+      city,
+      state,
+      country,
+      pin_code,
+    } = req.body;
+
+
+    const authRespose = await axios.post(`${process.env.SHIPROCKET_BASE_URL}/auth/login`, {
+      email: process.env.SHIPROCKET_EMAIL,
+      password: process.env.SHIPROCKET_PASSWORD,
+    })
+
+    // console.log(authRespose.data.token)
+
+    const data = {
+      pickup_location,
+      name: req.seller.name,
+      email: req.seller.email,
+      phone: req.seller.mobile_number,
+      address,
+      city,
+      state,
+      country,
+      pin_code,
+    }
+    const response = await axios.post(`${process.env.SHIPROCKET_BASE_URL}/settings/company/addpickup`, data, {
+      headers: {
+        'Authorization': `Bearer ${authRespose.data.token}`, // Replace with your access token
+        'Content-Type': 'application/json'
+      }
+    });
+
+    // console.log(response)
+    // console.log('Pickup location created successfully:', response.data);
+
+    if (response.status === 200) {
+      seller = req.seller;
+      seller.pickup_id = response.data.pickup_id;
+      seller.rto_address_id = response.data.address.rto_address_id;
+
+      await seller.save();
+    }
+
+    return res.status(201).send({ success: true, message: "Pickup location created successfully" });
+  } catch (error) {
+    // console.log("Error while creating seller pickup location", error.response);
+    // console.log(error?.response?.data)
+    if (error?.response?.data?.status_code === 422) {
+      return res.state(422).send({ success: false, message: error.response.data.message, errors: error.response.data.errors })
+    }
     return res.status(500).send({ success: false, message: "Internal server error" });
   }
 }
@@ -454,5 +518,149 @@ module.exports.sellerKYC = async function (req, res) {
       {},
       err.message
     );
+  }
+}
+
+module.exports.getAllOrders = async (req, res) => {
+  try {
+    const orderItems = await OrderItem.aggregate([
+      {
+        $lookup: {
+          from: 'orders',
+          localField: 'order_id',
+          foreignField: '_id',
+          as: 'orderDetails'
+        }
+      },
+      {
+        $lookup: {
+          from: 'products',
+          localField: 'product_id',
+          foreignField: '_id',
+          as: 'productDetails'
+        }
+      },
+      {
+        $match: {
+          $and: [
+            {
+              'is_canceled': false,
+            },
+            {
+              'is_awb_generated': false
+            },
+            {
+              'productDetails.seller_id': new mongoose.Types.ObjectId(req.seller._id)
+            },
+            {
+              'orderDetails.is_order_placed': true,
+            }
+          ]
+        }
+      },
+      {
+        $unwind: '$productDetails', // Flatten the orderDetails array
+      },
+      {
+        $unwind: '$orderDetails', // Flatten the orderDetails array
+      },
+      {
+        $lookup: {
+          from: 'variants',
+          localField: 'variant_id',
+          foreignField: '_id',
+          as: 'varinatDetails'
+        }
+      },
+      {
+        $unwind: '$varinatDetails', // Flatten the orderDetails array
+      },
+      {
+        $lookup: {
+          from: 'sizevariants',
+          localField: 'sizeVariantId',
+          foreignField: '_id',
+          as: 'sizeVariantDetails'
+        }
+      },
+      // {
+      //   $unwind: '$sizeVariantDetails', // Flatten the orderDetails array
+      // },
+      {
+        $project: {
+          _id: 1,
+          productDetails: 1,
+          varinatDetails: 1,
+          sizeVariantDetails: 1,
+          orderDetails: 1,
+          short_order_id: 1,
+          price: 1,
+          is_canceled: 1,
+          quantity: 1,
+          subTotalPrice: 1,
+          is_invoice_generated: 1,
+          is_cod: 1,
+          is_payment_success: 1,
+          order_payment_type: 1,
+          product_id: 1,
+          variant_id: 1,
+          sizeVariantId: 1,
+        }
+      }
+    ])
+
+    // console.log(orderItems)
+
+    return res.status(200).send({ success: true, message: "Orders found", orderItems });
+  } catch (error) {
+    console.log("Error while getting all orders fro seller", error);
+    return res.status(500).send({ success: false, message: "Internal server error" });
+  }
+}
+
+// To generate AWB with shiprocket
+module.exports.generateAwb = async (req, res) => {
+  try {
+    const { orderItemId } = req.body;
+
+    // Getting shipment id from shiprocketDetail collection using orderItemId
+    const shiprocketDetail = await ShiprocketDetail.findOne({
+      order_item_id: orderItemId
+    })
+    // If no data found then send BAD request response
+    if (!shiprocketDetail) {
+      return res.state(400).send({ success: false, message: "Bad request" })
+    }
+
+    // Getting auth token form shiprocket
+    const authRespose = await axios.post(`${process.env.SHIPROCKET_BASE_URL}/auth/login`, {
+      email: process.env.SHIPROCKET_EMAIL,
+      password: process.env.SHIPROCKET_PASSWORD,
+    })
+
+    // Create awb number using shiprocket api using shipment_id and courier_id
+    const awbGenerationResponse = await axios.post(`${process.env.SHIPROCKET_BASE_URL}/courier/assign/awb`,
+      {
+        shipment_id: shiprocketDetail.shipment_id,
+        courier_id: shiprocketDetail.courier_id,
+      },
+      {
+        headers: {
+          'Authorization': `Bearer ${authRespose.data.token}`, // Replace with your access token
+          'Content-Type': 'application/json'
+        }
+      }
+    )
+
+    console.log(awbGenerationResponse.data)
+    // After awb gerneration saved detai to ShiprocketDetail, (is_awb_generated, awb_generated_at, is_order_processeing) from orderItem
+
+    // Return success response after generating AWB number
+    return res.status(200).send({ success: true, message: "AWB generated" });
+  } catch (error) {
+    // While any error occures
+    console.log("Error while getting all orders fro seller", error);
+    console.log(error?.response?.data)
+    return res.status(500).send({ success: false, message: "Internal server error" });
   }
 }

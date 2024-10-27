@@ -1,11 +1,12 @@
 const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
-const sellerAddressSchema = new mongoose.Schema({
-    seller_id:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:"seller",
-        required:true
-    },
+const sellerAddressSchema = new Schema({
+  seller_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "seller",
+    required: true
+  },
   country: {
     type: String,
     required: true,
@@ -28,30 +29,30 @@ const sellerAddressSchema = new mongoose.Schema({
   house: {
     type: String,
   },
-  landMark:{
-    type:String
+  landMark: {
+    type: String
   },
-  tehsil:{
-type:String
+  tehsil: {
+    type: String
   },
-  mouza:{
-    type:String
+  mouza: {
+    type: String
 
   },
-  plot_Number:{
-    type:String
+  plot_Number: {
+    type: String
 
   },
-  policeStation:{
-    type:String,
+  policeStation: {
+    type: String,
   },
-  phone_number:{
-    type:String,
-require:true
+  phone_number: {
+    type: String,
+    require: true
   },
-  alternate_phone_number:{
-    type:String
+  alternate_phone_number: {
+    type: String
   }
-},{timestamps:true});
+}, { timestamps: true });
 
 module.exports = mongoose.model('sellerAddress', sellerAddressSchema);

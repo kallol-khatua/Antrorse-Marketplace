@@ -260,3 +260,114 @@ module.exports.getShirtDetails = async (req, res) => {
         return res.status(500).send({ success: false, message: "Internal server error" });
     }
 }
+
+module.exports.getProduct = async (req, res) => {
+    try {
+        const products = await Product.aggregate([
+            {
+                $match: {
+                    $and: [
+                        // {
+                        //     product_type: { $in: ["Default", "Foods & Beverages",, "Clothings"] }
+                        // },
+                        {
+                            isActive: true
+                        },
+                        {
+                            isApproved: true
+                        },
+                        {
+                            isRejected: false
+                        }
+                    ]
+                }
+            },
+            {
+                $sample: { size: 100 }
+            },
+            {
+                $lookup: {
+                    from: "variants",
+                    localField: "_id",
+                    foreignField: "product_id",
+                    as: "variantDetails"
+                }
+            },
+            {
+                $unwind: {
+                    path: "$variantDetails",
+                }
+            },
+            {
+                $sample: { size: 100 } // Adjust the size to the number of random variants you want
+            },
+            {
+                $lookup: {
+                    from: "variantinventories",
+                    localField: "variantDetails._id",
+                    foreignField: "product_variant_id",
+                    as: "variantInventoryDetails"
+                }
+            },
+            {
+                $lookup: {
+                    from: "sizevariants",
+                    localField: "variantDetails._id",
+                    foreignField: "product_variant_id",
+                    as: "sizeVariantDetails"
+                }
+            },
+        ])
+
+
+        return res.status(200).send({ success: true, message: "Product found successfully", products });
+    } catch (error) {
+        console.log("Error while getting shirt details", error)
+        return res.status(500).send({ success: false, message: "Internal server error" });
+    }
+}
+
+module.exports.viewDefaultProductDetail = async (req, res) => {
+    try {
+        const { productId } = req.query;
+
+        const productDetails = await Product.aggregate([
+            {
+                $match: {
+                    $and: [
+                        {
+
+                            _id: new mongoose.Types.ObjectId(productId)
+                        },
+                        {
+                            isActive: true
+                        },
+                        {
+                            isApproved: true
+                        },
+                        {
+                            isRejected: false
+                        }
+                    ]
+                }
+            },
+            {
+                $lookup: {
+                    from: "variants",
+                    localField: "_id",
+                    foreignField: "product_id",
+                    as: "variantDetails"
+                }
+            },
+        ])
+
+        if (!productDetails) {
+            return res.status(400).send({ success: false, message: "Wrong detail provided" });
+        }
+
+        return res.status(200).send({ success: true, message: "Product found successfully", productDetails });
+    } catch (error) {
+        console.log("Error while getting shirt details", error)
+        return res.status(500).send({ success: false, message: "Internal server error" });
+    }
+}

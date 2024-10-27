@@ -1,6 +1,8 @@
 require("dotenv").config()
 const express = require("express")
 const app = express()
+const fs = require("fs");
+const path = require("path");
 const multer = require("multer")
 const cors = require("cors")
 const bodyParser = require("body-parser")
@@ -24,6 +26,7 @@ const checkoutRouter = require("./router/checkoutRouter")
 const phonepeRoute = require("./router/phonepeRouter");
 const invoiceRouter = require("./router/invoiceRouter")
 const searchProductRouter = require("./router/searchProduct")
+const SizeVariant = require("./app/models/products/sizeVariant")
 
 app.use("/api/user", userRoute)
 app.use("/api/seller", sellerRoute)
@@ -39,37 +42,78 @@ app.use("/api/order", orderRouter)
 app.use("/api/checkout", checkoutRouter)
 
 app.use("/api", phonepeRoute);
-// app.use("/app", invoiceRouter)
 
-// app.post("/api/create-admin", async (req, res) => {
-//   try {
-//     const { name, email, mobile_number, password } = req.body;
 
-//     const findAdminByEmail = await Admin.findOne({ email: email });
-//     if (findAdminByEmail) {
-//       return res.status(400).send({ success: false, message: "Admin with this email already exist" });
-//     }
+const uploadDirectory = path.join(__dirname, "uploads");
 
-//     const findAdminByMobileNumber = await Admin.findOne({ mobile_number: mobile_number });
-//     if (findAdminByMobileNumber) {
-//       return res.status(400).send({ success: false, message: "Admin with this mobile number already exist" });
-//     }
+// Check if the uploads directory exists, and create it if it doesn't
+if (!fs.existsSync(uploadDirectory)) {
+  fs.mkdirSync(uploadDirectory, { recursive: true });
+}
 
-//     const salt = await bcrypt.genSalt(Number(process.env.SALT));
-//     const hashedPassword = await bcrypt.hash(password, salt);
+// Set up Multer storage
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, uploadDirectory);
+  },
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}-${file.originalname}`);
+  },
+});
 
-//     const newAdmin = new Admin({
-//       name, email, mobile_number, password: hashedPassword
-//     })
+const upload = multer({ storage });
 
-//     await newAdmin.save();
+// Define fields for conditional uploads
+const uploadFields = [
+  { name: "aadhaarFile", maxCount: 1 },
+  { name: "panFile", maxCount: 1 },
+  { name: "gstFile", maxCount: 1 },
+  { name: "fssaiFile", maxCount: 1 },
+  { name: "trademarkFile", maxCount: 1 },
+];
 
-//     return res.status(201).send({ success: true, message: "Admin created successfully" });
-//   } catch (error) {
-//     console.log("Error while creating admin")
-//     return res.status(500).send({ success: false, message: "Internal server error" });
-//   }
-// })
+app.post("/api/upload-documents", upload.fields(uploadFields), (req, res) => {
+  try {
+    console.log(req.files);
+
+    // Access form data
+    const {
+      aadhaarNumber,
+      panNumber,
+      gstNumber,
+      trademarkBrandName,
+      additionalBrands,
+    } = req.body;
+
+    // Files available in req.files
+    const { aadhaarFile, panFile, gstFile, fssaiFile, trademarkFile } = req.files;
+
+    // Additional brand NOC files if any
+    const brandNOCs = req.files.additionalBrands?.map((brand, index) => ({
+      brandName: req.body[`additionalBrands[${index}][brandName]`],
+      nocFile: brand.path,
+    }));
+
+    let data = {
+      aadhaarNumber,
+      aadhaarFile: aadhaarFile?.[0].path,
+      panNumber,
+      panFile: panFile?.[0].path,
+      gstNumber,
+      gstFile: gstFile?.[0].path,
+      fssaiFile: fssaiFile?.[0].path,
+      trademarkBrandName,
+      trademarkFile: trademarkFile?.[0].path,
+      additionalBrands: brandNOCs,
+    };
+    console.log(data)
+
+    res.status(200).json({ message: 'Files uploaded successfully' });
+  } catch (error) {
+    console.error("Upload error:", error);
+    res.status(500).json({ error: "Failed to upload files" });
+  }
+});
 
 const port = process.env.PORT_NUMBER || 3687;
 app.listen(port, function () {

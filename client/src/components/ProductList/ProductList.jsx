@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React, { useEffect, useState } from "react";
 import Pagination from "../Pagination/Pagination";
 import ProductCard from "../ProductCard/ProductCard";
@@ -5,9 +6,17 @@ import axios from "axios";
 import ProductCardSkeleton from "../ProductCard/ProductCardSkeleton";
 import { useSelector } from "react-redux";
 
-const ProductList = () => {
-  const [products, setProducts] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+const NoProduct = () => {
+  return (
+    <div className="h-60 bg-gray-100">
+      <div className="flex justify-center items-center h-full ">
+        <h1 className="font-semibold text-md">No product found</h1>
+      </div>
+    </div>
+  );
+};
+
+const ProductList = ({ isLoading, products }) => {
   const [itemsInCartId, setItemsInCartId] = useState([]);
   const [itemsInWishlistId, setItemsInWishlistId] = useState([]);
 
@@ -21,8 +30,7 @@ const ProductList = () => {
     setItemsInCartId(() => cartItemIds);
     setItemsInWishlistId(() => wishlistItemIds);
 
-
-    console.log(cartItemIds,wishlistItemIds)
+    // console.log(cartItemIds, wishlistItemIds);
   };
 
   const fetchData = async () => {
@@ -30,7 +38,6 @@ const ProductList = () => {
     //   const response = await axios(
     //     `${import.meta.env.VITE_BACKEND_URL}/app/product/searchProducts`
     //   );
-
     //   console.log(response.data.result);
     //   console.log(
     //     `${import.meta.env.VITE_BACKEND_URL}/app/product/searchProducts`
@@ -74,7 +81,7 @@ const ProductList = () => {
         break;
     }
 
-    setProducts(sortedProducts);
+    // setProducts(sortedProducts);
   };
 
   const handleSort = () => {
@@ -97,24 +104,25 @@ const ProductList = () => {
 
   return (
     <>
-      <section className="bg-white  text-gray-700 p-0">
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 lg:grid-cols-4  p-4 bg-gray-100 ">
-          {isLoading
-            ? Array.from({ length: 9 }, (_, index) => (
-                <ProductCardSkeleton key={index} />
-              ))
-            : products.map((product) => (
-                <ProductCard
-                  key={product._id}
-                  product={product}
-                  inCart={itemsInCartId.includes(product._id)}
-                  inWishlist={itemsInWishlistId.includes(product._id)}
-                />
-              ))}
-        </div>
+      <section className="bg-white  text-gray-700 p-0 bg-gray-100">
+        {isLoading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4  p-4  bg-gray-100 w-full justify-items-center">
+            {Array.from({ length: 24 }, (_, index) => (
+              <ProductCardSkeleton key={index} />
+            ))}
+          </div>
+        ) : products.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4  p-4  bg-gray-100 w-full justify-items-center">
+            {products.map((product, index) => (
+              <ProductCard key={index} product={product} />
+            ))}
+          </div>
+        ) : (
+          <NoProduct />
+        )}
       </section>
 
-      <Pagination />
+      {/* <Pagination /> */}
     </>
   );
 };

@@ -88,7 +88,7 @@ const Navbar = () => {
       }`}
     >
       {/* Add menu items for the user profile dropdown */}
-      <Link to="/account" className="block px-4 py-1 text-gray-800">
+      <Link to="/user/orders" className="block px-4 py-1 text-gray-800">
         My Profile
       </Link>
       <Link to="/account" className="block px-4 py-1 text-gray-800">

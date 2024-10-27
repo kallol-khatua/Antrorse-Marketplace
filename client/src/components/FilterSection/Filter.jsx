@@ -8,6 +8,7 @@ import ProductList from "../ProductList/ProductList";
 
 import SortOption from "../SortOption/SortOption";
 import { object } from "yup";
+import axios from "axios";
 
 const subCategories = [
   { name: "Totes", href: "#" },
@@ -101,6 +102,7 @@ const Filter = () => {
     const scrollTop = window.scrollY;
     setIsFixed(scrollTop > navbarHeight && scrollTop < bottomScreenHeight);
   };
+
   useEffect(() => {
     window.addEventListener("scroll", handleScroll);
 
@@ -109,10 +111,34 @@ const Filter = () => {
     };
   }, []);
 
+  const [products, setProducts] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const fetchData = async () => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/search-product/get-product`
+      );
+      // console.log(response.data);
+
+      setTimeout(() => {
+        setProducts(() => response.data.products);
+        setIsLoading(false);
+      }, [250]);
+    } catch (error) {
+      console.error("Error fetching products");
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
   return (
     <div className="bg-white">
-      <main className=" mx-auto max-w-9xl px-4 sm:px-6 lg:px-8">
-        <div className="flex items-baseline justify-between border-b border-gray-200 py-6">
+      <main className=" mx-auto max-w-9xl lg:px-8">
+        {/* <div className="flex items-baseline justify-between border-b border-gray-200 py-6">
           <h1 className="text-4xl font-bold tracking-tight text-gray-900">
             New Arrivals
           </h1>
@@ -138,10 +164,10 @@ const Filter = () => {
               <span className="sr-only">Filters</span>
             </button>
           </div>
-        </div>
+        </div> */}
 
-        <section className="flex justify-end">
-          <form
+        <section className="flex justify-end lg:flex-row flrx-col">
+          {/* <form
             style={{
               top: isFixed ? "100px" : "auto",
               width: "calc(25% - 1rem)",
@@ -201,7 +227,7 @@ const Filter = () => {
                               className={`w-5 h-5 rounded-sm bg-${option.value}-400`}
                               style={{ backgroundColor: option.value }}
                             />
-                            {/* <span className="capitalize">{option.value}</span> */}
+                            
                           </button>
                         ))}
                       </div>
@@ -265,10 +291,10 @@ const Filter = () => {
                 )}
               </div>
             ))}
-          </form>
+          </form> */}
 
-          <div className="w-4/5">
-            <ProductList />
+          <div className="lg:w-4/5 w-full">
+            <ProductList products={products} isLoading={isLoading} />
           </div>
         </section>
       </main>

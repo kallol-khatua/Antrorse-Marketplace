@@ -52,6 +52,25 @@ const variantSchema = new Schema({
     packaging_type: {
         type: String,
     },
+
+    length: {  // Length in cm
+        type: Number,
+    },
+    breadth: {  // Breadth in cm
+        type: Number,
+    },
+    height: {  // Height in cm
+        type: Number,
+    },
+    weight: { // Weight in kg
+        type: Number,
+    },
+    sku: {
+        type: String,
+    },
+    hsn: {
+        type: Number
+    },
     // ================ Foods & Beverages ================ //
 
     // ================ Clothing ================ //

@@ -1,4 +1,4 @@
-  import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axiosInstanceSeller from "../../axiosInstanceSeller";
 import { toast } from "react-toastify";
 
@@ -50,30 +50,55 @@ function ClothingForm() {
             actual_price: "",
             offered_price: "",
             quantity: "",
+
+            length: "",
+            breadth: "",
+            height: "",
+            weight: "",
           },
           {
             size: "M",
             actual_price: "",
             offered_price: "",
             quantity: "",
+
+            length: "",
+            breadth: "",
+            height: "",
+            weight: "",
           },
           {
             size: "L",
             actual_price: "",
             offered_price: "",
             quantity: "",
+
+            length: "",
+            breadth: "",
+            height: "",
+            weight: "",
           },
           {
             size: "XL",
             actual_price: "",
             offered_price: "",
             quantity: "",
+
+            length: "",
+            breadth: "",
+            height: "",
+            weight: "",
           },
           {
             size: "XXL",
             actual_price: "",
             offered_price: "",
             quantity: "",
+
+            length: "",
+            breadth: "",
+            height: "",
+            weight: "",
           },
         ],
       },
@@ -173,30 +198,55 @@ function ClothingForm() {
                   actual_price: "",
                   offered_price: "",
                   quantity: "",
+
+                  length: "",
+                  breadth: "",
+                  height: "",
+                  weight: "",
                 },
                 {
                   size: "M",
                   actual_price: "",
                   offered_price: "",
                   quantity: "",
+
+                  length: "",
+                  breadth: "",
+                  height: "",
+                  weight: "",
                 },
                 {
                   size: "L",
                   actual_price: "",
                   offered_price: "",
                   quantity: "",
+
+                  length: "",
+                  breadth: "",
+                  height: "",
+                  weight: "",
                 },
                 {
                   size: "XL",
                   actual_price: "",
                   offered_price: "",
                   quantity: "",
+                  length: "",
+
+                  breadth: "",
+                  height: "",
+                  weight: "",
                 },
                 {
                   size: "XXL",
                   actual_price: "",
                   offered_price: "",
                   quantity: "",
+
+                  length: "",
+                  breadth: "",
+                  height: "",
+                  weight: "",
                 },
               ],
             },
@@ -221,30 +271,55 @@ function ClothingForm() {
           actual_price: "",
           offered_price: "",
           quantity: "",
+
+          length: "",
+          breadth: "",
+          height: "",
+          weight: "",
         },
         {
           size: "M",
           actual_price: "",
           offered_price: "",
           quantity: "",
+
+          length: "",
+          breadth: "",
+          height: "",
+          weight: "",
         },
         {
           size: "L",
           actual_price: "",
           offered_price: "",
           quantity: "",
+
+          length: "",
+          breadth: "",
+          height: "",
+          weight: "",
         },
         {
           size: "XL",
           actual_price: "",
           offered_price: "",
           quantity: "",
+
+          length: "",
+          breadth: "",
+          height: "",
+          weight: "",
         },
         {
           size: "XXL",
           actual_price: "",
           offered_price: "",
           quantity: "",
+
+          length: "",
+          breadth: "",
+          height: "",
+          weight: "",
         },
       ],
     });
@@ -946,45 +1021,124 @@ function ClothingForm() {
                 {variant.size_variants.map((sizeVariant, sizeVariantIndex) => {
                   // console.log("size ", index )
                   return (
-                    <div key={sizeVariantIndex} className="flex w-full gap-x-2">
-                      {/* size */}
-                      <div className="flex gap-x-2 w-1/5 my-1">
+                    <div key={sizeVariantIndex} className="pb-2 border-b-2">
+                      <div className="flex w-full gap-x-2">
                         {/* size */}
-                        <div className="text-start flex flex-col w-full">
-                          <label
-                            className="block text-gray-700 text-md font-bold mb-1 "
-                            htmlFor="primary_color"
-                          >
-                            Size
-                          </label>
-                          <input
-                            type="text"
-                            id="primary_color"
-                            name="primary_color"
-                            value={sizeVariant.size}
-                            onChange={(e) => handleProductDataChange(e)}
-                            className="w-full border border-gray-300 p-2 rounded-md placeholder:text-base"
-                            placeholder="Enter primary color here"
-                            disabled
-                          />
+                        <div className="flex gap-x-2 w-1/5 my-1">
+                          {/* size */}
+                          <div className="text-start flex flex-col w-full">
+                            <label
+                              className="block text-gray-700 text-md font-bold mb-1 "
+                              htmlFor="primary_color"
+                            >
+                              Size
+                            </label>
+                            <input
+                              type="text"
+                              id="primary_color"
+                              name="primary_color"
+                              value={sizeVariant.size}
+                              onChange={(e) => handleProductDataChange(e)}
+                              className="w-full border border-gray-300 p-2 rounded-md placeholder:text-base"
+                              placeholder="Enter primary color here"
+                              disabled
+                            />
+                          </div>
+                        </div>
+
+                        {/* quantity, actual_price, offered_price */}
+                        <div className="flex gap-x-2 w-4/5 my-1">
+                          {/* quantity */}
+                          <div className="text-start flex flex-col w-1/3">
+                            <label
+                              className="block text-gray-700 text-md font-bold mb-1 "
+                              htmlFor={`quantity_${sizeVariantIndex}`}
+                            >
+                              Quantity
+                            </label>
+                            <input
+                              type="number"
+                              id={`quantity_${sizeVariantIndex}`}
+                              name="quantity"
+                              value={sizeVariant.quantity}
+                              onChange={(e) =>
+                                handleVariantSizeDataChange(
+                                  e,
+                                  variantIndex,
+                                  sizeVariantIndex
+                                )
+                              }
+                              className="w-full border border-gray-300 p-2 rounded-md placeholder:text-base"
+                              placeholder="Enter quantity here"
+                            />
+                          </div>
+
+                          {/* actual_price */}
+                          <div className="text-start flex flex-col w-1/3">
+                            <label
+                              className="block text-gray-700 text-md font-bold mb-1 "
+                              htmlFor={`actual_price_${sizeVariantIndex}`}
+                            >
+                              Actual price
+                            </label>
+                            <input
+                              type="number"
+                              id={`actual_price_${sizeVariantIndex}`}
+                              name="actual_price"
+                              value={sizeVariant.actual_price}
+                              onChange={(e) =>
+                                handleVariantSizeDataChange(
+                                  e,
+                                  variantIndex,
+                                  sizeVariantIndex
+                                )
+                              }
+                              className="w-full border border-gray-300 p-2 rounded-md placeholder:text-base"
+                              placeholder="Enter actual price here"
+                            />
+                          </div>
+
+                          {/* offered_price */}
+                          <div className="text-start flex flex-col w-1/3">
+                            <label
+                              className="block text-gray-700 text-md font-bold mb-1 "
+                              htmlFor={`offered_price_${sizeVariantIndex}`}
+                            >
+                              Offered price
+                            </label>
+                            <input
+                              type="number"
+                              id={`offered_price_${sizeVariantIndex}`}
+                              name="offered_price"
+                              value={sizeVariant.offered_price}
+                              onChange={(e) =>
+                                handleVariantSizeDataChange(
+                                  e,
+                                  variantIndex,
+                                  sizeVariantIndex
+                                )
+                              }
+                              className="w-full border border-gray-300 p-2 rounded-md placeholder:text-base"
+                              placeholder="Enter offered price here"
+                            />
+                          </div>
                         </div>
                       </div>
 
-                      {/* quantity, actual_price, offered_price */}
-                      <div className="flex gap-x-2 w-4/5 my-1">
-                        {/* quantity */}
-                        <div className="text-start flex flex-col w-1/3">
+                      <div className="flex w-full gap-x-2">
+                        {/* length */}
+                        <div className="text-start flex flex-col w-1/4">
                           <label
                             className="block text-gray-700 text-md font-bold mb-1 "
-                            htmlFor={`quantity_${sizeVariantIndex}`}
+                            htmlFor={`length_${sizeVariantIndex}`}
                           >
-                            Quantity
+                            After package length
                           </label>
                           <input
                             type="number"
-                            id={`quantity_${sizeVariantIndex}`}
-                            name="quantity"
-                            value={sizeVariant.quantity}
+                            id={`length_${sizeVariantIndex}`}
+                            name="length"
+                            value={sizeVariant.length}
                             onChange={(e) =>
                               handleVariantSizeDataChange(
                                 e,
@@ -993,23 +1147,23 @@ function ClothingForm() {
                               )
                             }
                             className="w-full border border-gray-300 p-2 rounded-md placeholder:text-base"
-                            placeholder="Enter quantity here"
+                            placeholder="Enter length in cm"
                           />
                         </div>
 
-                        {/* actual_price */}
-                        <div className="text-start flex flex-col w-1/3">
+                        {/* length */}
+                        <div className="text-start flex flex-col w-1/4">
                           <label
                             className="block text-gray-700 text-md font-bold mb-1 "
-                            htmlFor={`actual_price_${sizeVariantIndex}`}
+                            htmlFor={`breadth_${sizeVariantIndex}`}
                           >
-                            Actual price
+                            After package breadth
                           </label>
                           <input
                             type="number"
-                            id={`actual_price_${sizeVariantIndex}`}
-                            name="actual_price"
-                            value={sizeVariant.actual_price}
+                            id={`breadth_${sizeVariantIndex}`}
+                            name="breadth"
+                            value={sizeVariant.breadth}
                             onChange={(e) =>
                               handleVariantSizeDataChange(
                                 e,
@@ -1018,23 +1172,23 @@ function ClothingForm() {
                               )
                             }
                             className="w-full border border-gray-300 p-2 rounded-md placeholder:text-base"
-                            placeholder="Enter actual price here"
+                            placeholder="Enter breadth in cm"
                           />
                         </div>
 
-                        {/* offered_price */}
-                        <div className="text-start flex flex-col w-1/3">
+                        {/* length */}
+                        <div className="text-start flex flex-col w-1/4">
                           <label
                             className="block text-gray-700 text-md font-bold mb-1 "
-                            htmlFor={`offered_price_${sizeVariantIndex}`}
+                            htmlFor={`height_${sizeVariantIndex}`}
                           >
-                            Offered price
+                            After package height
                           </label>
                           <input
                             type="number"
-                            id={`offered_price_${sizeVariantIndex}`}
-                            name="offered_price"
-                            value={sizeVariant.offered_price}
+                            id={`height_${sizeVariantIndex}`}
+                            name="height"
+                            value={sizeVariant.height}
                             onChange={(e) =>
                               handleVariantSizeDataChange(
                                 e,
@@ -1043,7 +1197,32 @@ function ClothingForm() {
                               )
                             }
                             className="w-full border border-gray-300 p-2 rounded-md placeholder:text-base"
-                            placeholder="Enter offered price here"
+                            placeholder="Enter height in cm"
+                          />
+                        </div>
+
+                        {/* length */}
+                        <div className="text-start flex flex-col w-1/4">
+                          <label
+                            className="block text-gray-700 text-md font-bold mb-1 "
+                            htmlFor={`weight_${sizeVariantIndex}`}
+                          >
+                            After package weight
+                          </label>
+                          <input
+                            type="number"
+                            id={`weight_${sizeVariantIndex}`}
+                            name="weight"
+                            value={sizeVariant.weight}
+                            onChange={(e) =>
+                              handleVariantSizeDataChange(
+                                e,
+                                variantIndex,
+                                sizeVariantIndex
+                              )
+                            }
+                            className="w-full border border-gray-300 p-2 rounded-md placeholder:text-base"
+                            placeholder="Enter weight in kg"
                           />
                         </div>
                       </div>

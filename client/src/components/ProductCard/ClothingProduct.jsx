@@ -7,13 +7,16 @@ function ClothingProduct({ product }) {
   const getSubTitle = () => {
     let subtitle = product.ideal_for;
     if (product.fit) {
-      subtitle += ` ${product.fit}`;
+      subtitle += ` ${product.fit} fit`;
     }
     if (product.fabric) {
       subtitle += ` ${product.fabric}`;
     }
     if (product.generic_name) {
       subtitle += ` ${product.generic_name}`;
+    }
+    if (product.variantDetails) {
+      subtitle += ` (${product.variantDetails.primary_color})`;
     }
     return subtitle;
   };
@@ -27,44 +30,56 @@ function ClothingProduct({ product }) {
   return (
     <div className="relative flex w-full max-w-xs flex-col overflow-hidden rounded-lg border border-gray-100 bg-white shadow-md group">
       <Link
-        to={`/clothings/shirts/view-details?productId=${product._id}&variantId=${product.variants[0]._id}`}
+        to={`/clothings/view-details?productId=${product._id}&variantId=${product.variantDetails._id}&sizeVariantId=${product.sizeVariantDetails[0]._id}`}
+        // to="/viewproducts"
       >
-        {/* <Link to={`/productdetail/${product._id}`} inWishlist={inWishlist}> */}
-        <div className="flex items-center justify-center h-[11.25rem] p-2 overflow-hidden group-hover:scale-105 transition-transform">
+        {/* Image */}
+        <div className="relative flex items-center justify-center h-[11.25rem] overflow-hidden group-hover:scale-105 transition-transform">
           <img
-            className="object-contain w-full h-full rounded-t-sm"
+            className="w-full h-full object-contain rounded-t-sm"
             src={
               product?.images ||
               "https://m.media-amazon.com/images/I/71+LK6XTuFL._AC_UY1100_.jpg"
             }
-            // alt={product?.name}
+            alt={product?.product_name || "Product Image"}
           />
 
-          <span className="absolute top-1 left-1 m-2 rounded-full bg-black px-2 text-center text-sm font-medium text-white">
-            {/* {`${product.discount}`}% OFF */}
-          </span>
+          {product.sizeVariantDetails[0].offered_price !=
+            product.sizeVariantDetails[0].actual_price && (
+            <span className="absolute top-1 left-1 m-1 rounded-full bg-black px-2 text-center text-sm font-medium text-white">
+              {`${calculateDiscount(
+                product.sizeVariantDetails[0].actual_price,
+                product.sizeVariantDetails[0].offered_price
+              )}% OFF`}
+            </span>
+          )}
+
+          {/* {product.variantInventoryDetails[0].available_quantity <= 10 && (
+            <span className="absolute bottom-0 left-0 bg-black px-2 text-center text-sm font-medium text-white">
+              {`${product.variantInventoryDetails[0].available_quantity} Remaining`}
+            </span>
+          )} */}
         </div>
 
         <div className="mt-4 px-3 pb-3 flex flex-col flex-1 gap-1 ">
-          <h5 className="text-md tracking-tight text-slate-900 line-clamp-2 font-bold">
-            {product.brand_name}
-          </h5>
-          <p className="text-sm tracking-tight text-slate-900 line-clamp-2">
+          <h5 className="text-md tracking-tight text-slate-900 line-clamp-2 font-semibold ">
+            {/* {product.product_name} */}
+            {/* {product.brand_name + " (" + product?.variantDetails?.primary_color + " Colour)"} */}
             {getSubTitle()}
-          </p>
+          </h5>
           <div>
-            <span className="text-sm font-bold">
-              {product.variants[0].offered_price}
+            <span className="text-md font-bold">
+              ₹{product.sizeVariantDetails[0].offered_price}
             </span>{" "}
             {/* if actual price and offered proce are different */}
-            <span className="text-xs line-through">
-              {product.variants[0].actual_price}
+            <span className="text-xs line-through font-semibold">
+              ₹{product.sizeVariantDetails[0].actual_price}
             </span>{" "}
-            <span className="text-xs text-red-400">
+            <span className="text-sm text-green-600 font-semibold">
               (
               {calculateDiscount(
-                product.variants[0].actual_price,
-                product.variants[0].offered_price
+                product.sizeVariantDetails[0].actual_price,
+                product.sizeVariantDetails[0].offered_price
               )}
               % OFF)
             </span>{" "}

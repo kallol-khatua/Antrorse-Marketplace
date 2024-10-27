@@ -2,6 +2,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { BiSupport } from "react-icons/bi";
 import { useDispatch } from "react-redux";
 import { setSellerAuth } from "../../redux/features/Seller/SellerSclice";
+import { MdOutlineUploadFile } from "react-icons/md";
 
 const SellerSidebar = () => {
   const navigate = useNavigate();
@@ -195,8 +196,18 @@ const SellerSidebar = () => {
                   Add product
                 </NavLink>
 
-                {/* All products  */}
                 <NavLink
+                  to="/seller/upload-document"
+                  className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-gray-200 duration-300 ease-in-out hover:bg-teal-800 dark:hover:bg-gray-600-4 text-lg  `}
+                >
+                  <div className="text-lg">
+                    <MdOutlineUploadFile />
+                  </div>
+                  Upload document
+                </NavLink>
+
+                {/* All products  */}
+                {/* <NavLink
                   to="/seller/all-products"
                   className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-gray-200 duration-300 ease-in-out hover:bg-teal-800 dark:hover:bg-gray-600-4 text-lg  `}
                 >
@@ -230,7 +241,7 @@ const SellerSidebar = () => {
                     />
                   </svg>
                   All products
-                </NavLink>
+                </NavLink> */}
 
                 {/* <!-- Dropdown Menu Start --> */}
                 <div

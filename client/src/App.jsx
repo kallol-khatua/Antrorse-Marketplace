@@ -51,6 +51,15 @@ import AddAdminProduct from "./Pages/AddAdminProduct/AddAdminProduct";
 import ApproveSellerProducts from "./Pages/ApproveSellerProducts/ApproveSellerProducts";
 import AuthorizeSeller from "./Pages/AuthorizeSeller/AuthorizeSeller";
 import ProductBuy from "./Pages/ProductBuy/ProductBuy";
+import AccountLayout from "./Pages/Account/AccountLayout";
+import AllOrders from "./Pages/Account/AllOrders";
+import Addresses from "./Pages/Account/Addresses";
+import SellerOrders from "./components/SellerOrders/SellerOrders";
+import UploadDocument from "./Pages/SellerUploadDocument/UploadDocument";
+import DefaultProductDetails from "./Pages/DefaultProductDetails/DefaultProductDetails";
+
+import AdminOrders from "./components/AdminOrders/AdminOrders";
+import FoodsAndBeveragesProduct from "./Pages/ProductDetails/FoodsAndBeveragesProduct";
 
 function App() {
   return (
@@ -83,9 +92,9 @@ function App() {
           <Route path="Invoice" element={<Invoice />} />
 
           {/* Clothings product */}
-          <Route path="clothings" element={<ClothingLayout />}>
+          {/* <Route path="clothings" element={<ClothingLayout />}>
             <Route path="shirts" element={<Shirts />} />
-          </Route>
+          </Route> */}
           <Route
             path="clothings/shirts/view-details"
             element={<ShirtProductDetails />}
@@ -94,6 +103,34 @@ function App() {
             path="clothings/shirts/view-details/buy-now"
             element={<ProductBuy />}
           />
+
+          {/* Clothing */}
+          <Route
+            path="clothings/view-details"
+            element={<ShirtProductDetails />}
+          />
+
+          {/* Default product */}
+          <Route
+            path="default/view-details"
+            element={<DefaultProductDetails />}
+          />
+          <Route path="default/view-details/buy-now" element={<ProductBuy />} />
+
+          {/* Foods and Beverages product */}
+          <Route
+            path="foods-and-beverages/view-details"
+            element={<FoodsAndBeveragesProduct />}
+          />
+          <Route
+            path="foods-and-beverages/view-details/buy-now"
+            element={<ProductBuy />}
+          />
+
+          <Route path="/user" element={<AccountLayout />}>
+            <Route path="orders" element={<AllOrders />} />
+            <Route path="address" element={<Addresses />} />
+          </Route>
         </Route>
 
         {/* <Route path="/admin" element={<Admin />} /> */}
@@ -103,10 +140,11 @@ function App() {
 
         <Route path="/seller" element={<SellerDashboardLayout />}>
           <Route path="dashboard" element={<Metric />} />
+          <Route path="upload-document" element={<UploadDocument />} />
           <Route path="profile" element={<SellerAccount />} />
           <Route path="add-product" element={<AddProduct />} />
           <Route path="all-products" element={<AllProducts />} />
-          <Route path="orders" element={<Metric />} />
+          <Route path="orders" element={<SellerOrders />} />
           <Route path="settings" element={<Metric />} />
           <Route path="help-and-support" element={<Metric />} />
         </Route>
@@ -125,7 +163,7 @@ function App() {
             element={<AddAdminProduct />}
           />
           <Route path="all-products" element={<AllProducts />} />
-          <Route path="orders" element={<Metric />} />
+          <Route path="orders" element={<AdminOrders />} />
           <Route path="settings" element={<Metric />} />
           <Route path="help-and-support" element={<Metric />} />
         </Route>

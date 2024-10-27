@@ -1,5 +1,6 @@
 import React from "react";
 import image from "../../assets/images/cta-img.png";
+import { Link } from "react-router-dom";
 const CTA = () => {
   return (
     <div className="flex justify-center py-4 bg-slate-200 ">
@@ -15,8 +16,8 @@ const CTA = () => {
               making them an excellent alternative to chemical air fresheners.
               Devi Aroma Products are free from charcoal & chemicals
             </p>
-            <a
-              href="/viewproducts"
+            <Link
+              to="/viewproducts"
               className="group mt-auto flex w-44 cursor-pointer select-none items-center justify-center rounded-md bg-black px-6 py-2 text-white transition"
             >
               <span className="group flex w-full items-center justify-center rounded py-1 text-center font-bold">
@@ -37,7 +38,7 @@ const CTA = () => {
                   d="M14 5l7 7m0 0l-7 7m7-7H3"
                 />
               </svg>
-            </a>
+            </Link>
           </div>
           <div className="order-first ml-auto h-48 w-full bg-gray-700 sm:order-none sm:h-auto sm:w-1/2 lg:w-2/5">
             <img

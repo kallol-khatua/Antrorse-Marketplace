@@ -19,6 +19,20 @@ const adminSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    pin_code: {
+        type: Number,
+        required: true
+    },
+    
+    pickup_id: {
+        type: Number
+    },
+    rto_address_id: {
+        type: Number
+    },
+    pickup_location: {
+        type: String
+    },
 }, { timestamps: true, });
 
 // generating jwt token

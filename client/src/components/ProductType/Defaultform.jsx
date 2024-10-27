@@ -23,6 +23,11 @@ function Defaultform() {
 
         quantity: "",
         min_order_quantity: "",
+
+        length: "",
+        breadth: "",
+        height: "",
+        weight: "",
       },
     ],
   });
@@ -42,6 +47,11 @@ function Defaultform() {
 
       quantity: "",
       min_order_quantity: "",
+
+      length: "",
+      breadth: "",
+      height: "",
+      weight: "",
     });
 
     setproductData((prev) => ({ ...prev, variants: newVariant }));
@@ -86,6 +96,11 @@ function Defaultform() {
 
               quantity: "",
               min_order_quantity: "",
+
+              length: "",
+              breadth: "",
+              height: "",
+              weight: "",
             },
           ],
         });
@@ -365,6 +380,88 @@ function Defaultform() {
                       onChange={(e) => handleVariantDataChange(e, variantIndex)}
                       placeholder="Enter minimum order quantity"
                       className="w-full border border-gray-300 p-2 rounded-md"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="flex gap-x-2">
+                  {/* length */}
+                  <div className="text-start w-1/2">
+                    <label
+                      className="text-start block text-gray-700 text-md font-bold mb-2"
+                      htmlFor="length"
+                    >
+                      After package length
+                    </label>
+                    <input
+                      type="number"
+                      id="length"
+                      name="length"
+                      value={productData.length}
+                      onChange={(e) => handleVariantDataChange(e, variantIndex)}
+                      className="w-full border border-gray-300 p-2 rounded-md"
+                      placeholder="Enter length in cm"
+                      required
+                    />
+                  </div>
+                  {/* breadth */}
+                  <div className="text-start w-1/2">
+                    <label
+                      className="text-start block text-gray-700 text-md font-bold mb-2"
+                      htmlFor="breadth"
+                    >
+                      After package breadth
+                    </label>
+                    <input
+                      type="number"
+                      id="breadth"
+                      name="breadth"
+                      value={productData.breadth}
+                      onChange={(e) => handleVariantDataChange(e, variantIndex)}
+                      className="w-full border border-gray-300 p-2 rounded-md"
+                      placeholder="Enter breadth in cm"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="flex gap-x-2">
+                  {/* height */}
+                  <div className="text-start w-1/2">
+                    <label
+                      className="text-start block text-gray-700 text-md font-bold mb-2"
+                      htmlFor="height"
+                    >
+                      After package height
+                    </label>
+                    <input
+                      type="number"
+                      id="height"
+                      name="height"
+                      value={productData.height}
+                      onChange={(e) => handleVariantDataChange(e, variantIndex)}
+                      className="w-full border border-gray-300 p-2 rounded-md"
+                      placeholder="Enter height in cm"
+                      required
+                    />
+                  </div>
+                  {/* breadth */}
+                  <div className="text-start w-1/2">
+                    <label
+                      className="text-start block text-gray-700 text-md font-bold mb-2"
+                      htmlFor="weight"
+                    >
+                      After package weight
+                    </label>
+                    <input
+                      type="number"
+                      id="weight"
+                      name="weight"
+                      value={productData.weight}
+                      onChange={(e) => handleVariantDataChange(e, variantIndex)}
+                      className="w-full border border-gray-300 p-2 rounded-md"
+                      placeholder="Enter weight in kg"
                       required
                     />
                   </div>

@@ -22,6 +22,10 @@ const productSchema = new Schema({
     }
   ],
 
+  isActive: {
+    type: Boolean,
+    default: false
+  },
   isApproved: {
     type: Boolean,
     default: false

@@ -4,7 +4,15 @@
 @tailwind components;
 @tailwind utilities;
 
+/* src/index.css or global.css */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
+}
 
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
 
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
@@ -60,7 +68,6 @@ input::-webkit-inner-spin-button {
   transform: translate(25%, 52.5%);
 }
 
-
 .side-image {
   background: url(./assets/images/big-banner.png);
   background-repeat: no-repeat;
@@ -78,4 +85,4 @@ input::-webkit-inner-spin-button {
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
-}  
+}

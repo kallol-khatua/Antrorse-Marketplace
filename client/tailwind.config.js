@@ -21,6 +21,9 @@ export default {
     },
 
     extend: {
+      colors: {
+        ConfirmAndPay: '#E51C22', // Saffron color
+      },
       // colors: {
       //   current: "currentColor",
       //   transparent: "transparent",

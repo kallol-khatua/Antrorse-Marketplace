@@ -7,6 +7,7 @@ import image5 from "../../assets/images/product-15.png";
 import image6 from "../../assets/images/product-16.png";
 import image7 from "../../assets/images/product-17.png";
 import image8 from "../../assets/images/product-18.png";
+import { Link } from "react-router-dom";
 
 const RelatedProducts = () => {
   const location = window.location.pathname;
@@ -17,7 +18,7 @@ const RelatedProducts = () => {
     >
       {/* <!--   ✅ Product card 1 - Starts Here 👇 --> */}
       <div className="sm:w-72 bg-white shadow-md rounded-xl duration-500 hover:scale-105 hover:shadow-xl">
-        <a href="/viewproducts">
+        <Link to="/viewproducts">
           <img
             src={image1}
             alt="Product"
@@ -49,13 +50,13 @@ const RelatedProducts = () => {
               )}
             </div>
           </div>
-        </a>
+        </Link>
       </div>
       {/* <!--   🛑 Product card 1 - Ends Here  --> */}
 
       {/* <!--   ✅ Product card 2 - Starts Here 👇 --> */}
       <div className="sm:w-72 bg-white shadow-md rounded-xl duration-500 hover:scale-105 hover:shadow-xl">
-        <a href="/viewproducts">
+        <Link to="/viewproducts">
           <img
             src={image2}
             alt="Product"
@@ -87,13 +88,13 @@ const RelatedProducts = () => {
               )}
             </div>
           </div>
-        </a>
+        </Link>
       </div>
       {/* <!--   🛑 Product card 2- Ends Here  --> */}
 
       {/* <!--   ✅ Product card 3 - Starts Here 👇 --> */}
       <div className="w-72 bg-white shadow-md rounded-xl duration-500 hover:scale-105 hover:shadow-xl">
-        <a href="/viewproducts">
+        <Link to="/viewproducts">
           <img
             src={image3}
             alt="Product"
@@ -125,13 +126,13 @@ const RelatedProducts = () => {
               )}
             </div>
           </div>
-        </a>
+        </Link>
       </div>
       {/* <!--   🛑 Product card 3 - Ends Here  --> */}
 
       {/* <!--   ✅ Product card 4 - Starts Here 👇 --> */}
       <div className="w-72 bg-white shadow-md rounded-xl duration-500 hover:scale-105 hover:shadow-xl">
-        <a href="/viewproducts">
+        <Link to="/viewproducts">
           <img
             src={image4}
             alt="Product"
@@ -163,10 +164,10 @@ const RelatedProducts = () => {
               )}
             </div>
           </div>
-        </a>
+        </Link>
       </div>
       <div className="w-72 bg-white shadow-md rounded-xl duration-500 hover:scale-105 hover:shadow-xl">
-        <a href="/viewproducts">
+        <Link to="/viewproducts">
           <img
             src={image5}
             alt="Product"
@@ -198,13 +199,13 @@ const RelatedProducts = () => {
               )}
             </div>
           </div>
-        </a>
+        </Link>
       </div>
       {/* <!--   🛑 Product card 1 - Ends Here  --> */}
 
       {/* <!--   ✅ Product card 2 - Starts Here 👇 --> */}
       <div className="w-72 bg-white shadow-md rounded-xl duration-500 hover:scale-105 hover:shadow-xl">
-        <a href="/viewproducts">
+        <Link to="/viewproducts">
           <img
             src={image6}
             alt="Product"
@@ -236,13 +237,13 @@ const RelatedProducts = () => {
               )}
             </div>
           </div>
-        </a>
+        </Link>
       </div>
       {/* <!--   🛑 Product card 2- Ends Here  --> */}
 
       {/* <!--   ✅ Product card 3 - Starts Here 👇 --> */}
       <div className="w-72 bg-white shadow-md rounded-xl duration-500 hover:scale-105 hover:shadow-xl">
-        <a href="/viewproducts">
+        <Link to="/viewproducts">
           <img
             src={image7}
             alt="Product"
@@ -274,13 +275,13 @@ const RelatedProducts = () => {
               )}
             </div>
           </div>
-        </a>
+        </Link>
       </div>
       {/* <!--   🛑 Product card 3 - Ends Here  --> */}
 
       {/* <!--   ✅ Product card 4 - Starts Here 👇 --> */}
       <div className="w-72 bg-white shadow-md rounded-xl duration-500 hover:scale-105 hover:shadow-xl">
-        <a href="/viewproducts">
+        <Link to="/viewproducts">
           <img
             src={image8}
             alt="Product"
@@ -312,7 +313,7 @@ const RelatedProducts = () => {
               )}
             </div>
           </div>
-        </a>
+        </Link>
       </div>
       {/* <!--   🛑 Product card 4 - Ends Here  --> */}
     </section>

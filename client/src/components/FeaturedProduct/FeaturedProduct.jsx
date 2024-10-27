@@ -4,6 +4,7 @@ import image from "../../assets/images/product-15.png";
 import image2 from "../../assets/images/product-16.png";
 import image3 from "../../assets/images/product-19.png";
 import image4 from "../../assets/images/product-17.png";
+import { Link } from "react-router-dom";
 // import { Link } from "react-router-dom";
 
 const FeaturedProduct = () => {
@@ -22,7 +23,7 @@ const FeaturedProduct = () => {
 
         <div className="mt-10 grid grid-cols-2 gap-6 lg:mt-16 lg:grid-cols-4 lg:gap-4">
           <article className="relative">
-            <a href="/viewproducts" title="" className="cursor-pointer">
+            <Link to="/viewproducts" title="" className="cursor-pointer">
               <div className="aspect-square overflow-hidden">
                 <img
                   className="group-hover:scale-125 h-full w-full object-cover transition-all duration-300"
@@ -110,12 +111,12 @@ const FeaturedProduct = () => {
                   </p>
                 </div>
               </div>
-            </a>
+            </Link>
           </article>
 
           <article className="relative">
             <Ribbon />
-            <a href="/viewproducts" title="" className="cursor-pointer">
+            <Link to="/viewproducts" title="" className="cursor-pointer">
               <div className="aspect-square overflow-hidden">
                 <img
                   className="group-hover:scale-125 h-full w-full object-cover transition-all duration-300"
@@ -196,11 +197,11 @@ const FeaturedProduct = () => {
                   </p>
                 </div>
               </div>
-            </a>
+            </Link>
           </article>
 
           <article className="relative">
-            <a href="/viewproducts" title="" className="cursor-pointer">
+            <Link to="/viewproducts" title="" className="cursor-pointer">
               <div className="aspect-square overflow-hidden">
                 <img
                   className="group-hover:scale-125 h-full w-full object-cover transition-all duration-300"
@@ -279,11 +280,11 @@ const FeaturedProduct = () => {
                   </p>
                 </div>
               </div>
-            </a>
+            </Link>
           </article>
 
           <article className="relative">
-            <a href="/viewproducts" title="" className="cursor-pointer">
+            <Link to="/viewproducts" title="" className="cursor-pointer">
               <div className="aspect-square overflow-hidden">
                 <img
                   className="group-hover:scale-125 h-full w-full object-cover transition-all duration-300"
@@ -364,7 +365,7 @@ const FeaturedProduct = () => {
                   </p>
                 </div>
               </div>
-            </a>
+            </Link>
           </article>
         </div>
       </div>

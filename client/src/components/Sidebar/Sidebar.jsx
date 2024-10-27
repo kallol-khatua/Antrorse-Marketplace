@@ -166,13 +166,13 @@ const Sidebar = () => {
                   Add product
                 </NavLink>
 
-                <NavLink
+                {/* <NavLink
                   to="/admin/approve-seller-product"
                   className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium  text-gray-200 duration-300 ease-in-out hover:bg-gray-600 dark:hover:bg-gray-600-4 text-lg   `}
                 >
                   <MdVerified />
                   Approve products
-                </NavLink>
+                </NavLink> */}
 
                 {/* <!-- Menu Item Tables --> */}
                 <NavLink

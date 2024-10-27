@@ -14,6 +14,8 @@ require("dotenv").config()
 const userAddressModel = require("../models/user/userAddressModel")
 const validation = require("../helper/validation");
 const Admin = require("../models/admin/admin");
+const OrderItem = require("../models/orders/orderItem");
+const { default: mongoose } = require("mongoose");
 
 module.exports.login = async function (req, res) {
   try {
@@ -353,6 +355,138 @@ module.exports.getProductForApproval = async (req, res) => {
     return res.status(200).send({ success: true, message: "product found", products });
   } catch (error) {
     console.log("Error while getting products for approval", error);
+    return res.status(500).send({ success: false, message: "Internal server error" })
+  }
+}
+
+module.exports.getOrdersForGenerateAWB = async (req, res) => {
+  try {
+    const orderItems = await OrderItem.aggregate([
+      {
+        $lookup: {
+          from: 'orders',
+          localField: 'order_id',
+          foreignField: '_id',
+          as: 'orderDetails'
+        }
+      },
+      {
+        $unwind: '$orderDetails',
+      },
+      {
+        $lookup: {
+          from: 'products',
+          localField: 'product_id',
+          foreignField: '_id',
+          as: 'productDetails'
+        }
+      },
+      {
+        $unwind: '$productDetails',
+      },
+      {
+        $match: {
+          $and: [
+            {
+              'is_canceled': false,
+            },
+            {
+              'is_awb_generated': false
+            },
+            {
+              'productDetails.admin_id': new mongoose.Types.ObjectId(req.admin._id)
+            },
+            {
+              'orderDetails.is_order_placed': true,
+            }
+          ]
+        }
+      },
+      {
+        $lookup: {
+          from: 'variants',
+          localField: 'variant_id',
+          foreignField: '_id',
+          as: 'varinatDetails'
+        }
+      },
+      {
+        $unwind: '$varinatDetails',
+      },
+
+
+
+      // DUE
+      {
+        $addFields: {
+          hasSizeVariantId: { $cond: { if: { $gt: ["$sizeVariantId", null] }, then: true, else: false } },
+        },
+      },
+      {
+        $lookup: {
+          from: "sizevariants",
+          localField: "sizeVariantId",
+          foreignField: "_id",
+          as: "sizeVariantDetails",
+        },
+      },
+
+      // {
+      //   $lookup: {
+      //     from: 'sizevariants',
+      //     localField: 'sizeVariantId',
+      //     foreignField: '_id',
+      //     as: 'sizeVariantDetails'
+      //   }
+      // },
+
+      // {
+      //   $unwind: '$sizeVariantDetails',
+      //   preserveNullAndEmptyArrays: true
+      // },
+
+      {
+        $project: {
+          _id: 1,
+          short_order_id: 1,
+          invoice_id: 1,
+
+
+          // DUE
+          hasSizeVariantId: 1,
+          sizeVariantDetails: { $cond: { if: { $gt: ["$sizeVariantId", null] }, then: "$sizeVariantDetails", else: [] } },
+
+
+
+          price: 1,
+          quantity: 1,
+          subTotalPrice: 1,
+          deliveryCharge: 1,
+          totalAmount: 1,
+
+          is_cod: 1,
+          is_payment_success: 1,
+          order_payment_type: 1,
+
+          productDetails: 1,
+          varinatDetails: 1,
+
+          sizeVariantDetails: 1,
+          orderDetails: 1,
+
+          is_canceled: 1,
+          is_awb_generated: 1,
+
+          // product_id: 1,
+          // variant_id: 1,
+          // sizeVariantId: 1,
+        }
+      }
+    ])
+
+    return res.status(200).send({ success: true, message: "Order items found", orderItems });
+  } catch (error) {
+    console.log("Error while getting order for generatinf awb number form admin", error);
     return res.status(500).send({ success: false, message: "Internal server error" })
   }
 }

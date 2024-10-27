@@ -19,6 +19,28 @@ const sizeVariantSchema = new Schema({
         type: Number,
         required: true,
     },
+    length: {  // Length in cm
+        type: Number,
+        required: true,
+    },
+    breadth: {  // Breadth in cm
+        type: Number,
+        required: true,
+    },
+    height: {  // Height in cm
+        type: Number,
+        required: true,
+    },
+    weight: { // Weight in kg
+        type: Number,
+        required: true,
+    },
+    sku: {
+        type: String,
+    },
+    hsn: {
+        type: Number
+    }
 }, { timestamps: true });
 
 const SizeVariant = mongoose.model("SizeVariant", sizeVariantSchema);

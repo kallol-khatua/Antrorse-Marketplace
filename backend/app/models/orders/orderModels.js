@@ -1,105 +1,115 @@
 const mongoose = require("mongoose");
-let ObjectId = mongoose.Schema.Types.ObjectId;
+const Schema = mongoose.Schema;
 
-const orderSchema = new mongoose.Schema(
+const orderSchema = new Schema(
   {
-    user_id: { type: ObjectId, ref: "user", required: true },
-    shippingInfo: {
-      type: String,
-      enum: ["home", "work"],
+    user_id: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
       required: true,
     },
-    address_id: {
-      type: ObjectId,
+
+    // delivery address
+    delivery_address_id: {
+      type: Schema.Types.ObjectId,
       ref: "Address",
       required: true,
     },
-    orderItems: [
-      {
-        product_name: {
-          type: String,
-          required: true,
-        },
-        price: {
-          type: Number,
-          required: true,
-        },
-        quantity: {
-          type: Number,
-          required: true,
-        },
-        sizes: [
-          {}
-        ],
+    delivery_customer_name: {
+      type: String,
+      required: true
+    },
+    delivery_custome_last_name: {
+      type: String,
+      required: true
+    },
+    delivery_address: {
+      type: String,
+      required: true
+    },
+    delivery_address_2: {
+      type: String
+    },
+    delivery_city: {
+      type: String,
+      required: true
+    },
+    delivery_pincode: {
+      type: Number,
+      required: true
+    },
+    delivery_state: {
+      type: String,
+      required: true
+    },
+    delivery_country: {
+      type: String,
+      required: true
+    },
+    delivery_email: {
+      type: String,
+      required: true
+    },
+    delivery_phone: {
+      type: Number,
+      required: true
+    },
+    delivery_landmark: {
+      type: String,
+    },
 
-        product_id: {
-          type: ObjectId,
-          ref: "Product",
-          required: true,
-        },
-        color:mongoose.Schema.Types.Mixed
-      },
-    ],
-    totalPrice: { type: Number, required: true, default: 0 },
-    totalItems: { type: Number, required: true },
-    totalQuantity: { type: Number, required: true },
-    
-  transactionId: String,
-  
-  
+
+    // Charge information
+    totalItems: {
+      type: Number,
+      required: true
+    },
+    totalQuantity: {
+      type: Number,
+      required: true
+    },
+    subTotalPrice: {
+      type: Number,
+      required: true
+    },
+    deliveryCharge: {
+      type: Number,
+      require: true
+    },
+    totalAmount: {
+      type: Number,
+      required: true
+    },
+
+    // order details
+    is_order_placed: {
+      type: Boolean,
+      default: false
+    },
+    orderPlacedAt: {
+      type: Date,
+    },
+
+    // payment information - usefull for multiple product
+    is_cod: {
+      type: Number,
+      default: 0
+    },
+    is_payment_success: {
+      type: Boolean,
+      default: false
+    },
+    order_payment_type: {
+      type: String,
+    },
+    transactionId: {
+      type: String
+    },
     paidAt: {
       type: Date,
     },
+  }, { timestamps: true });
 
-    orderStatus: {
-      type: String,
-      default: "pending",
-      enum: ["pending", "completed", "canceled"],
-    },
-    deliveredAt: Date,
-    shippedAt: Date,
-    createdAt: {
-      type: Date,
-      default: Date.now,
-    },
-    deletedAt: { type: Date, default: null },
-    orderId: {
-      type: String,
-    },
-    order_processing: {
-      type: Boolean,
-      default: false,
-    },
-    shipped: {
-      type: Boolean,
-      default: false,
-    },
-    inTransit: {
-      type: Boolean,
-      default: false,
-    },
-    outForDelivery: {
-      type: Boolean,
-      default: false,
-    },
-    delivered: {
-      type: Boolean,
-      default: false,
-    },
-    refunded: {
-      type: Boolean,
-      default: false,
-    },
-    channel_id: {
-      type: String,
-    },
+const Order = mongoose.model("Order", orderSchema);
 
-    pickup_location: {
-      type: String,
-      require: true,
-    },
-  },
-  { timestamps: true }
-);
-
-module.exports = mongoose.model("Order", orderSchema);
+module.exports = Order;

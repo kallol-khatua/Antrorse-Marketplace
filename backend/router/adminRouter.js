@@ -26,6 +26,8 @@ const verifyAdminAuthToken = async (req, res, next) => {
     }
 }
 
+route.get("/get-all-orders/generate-awb", verifyAdminAuthToken, adminController.getOrdersForGenerateAWB)
+
 route.post("/login", adminController.login)
 route.get("/totalUser", adminController.totalUser)
 route.get("/totalSeller", adminController.totalSeller)

@@ -8,6 +8,17 @@ const { ErrorCode, SuccessCode } = require("../helper/statusCode");
 const { SuccessMessage, ErrorMessage } = require("../helper/message");
 // const orderModel = require("../models/orders/orderModel");
 const orderModel = require("../models/orders/orderModels");
+const SizeVariant = require("../models/products/sizeVariant")
+const SizeVariantInventory = require("../models/products/sizeVariantInventory")
+const Variant = require("../models/products/variant");
+const Address = require("../models/user/userAddressModel");
+const Order = require("../models/orders/orderModels");
+const OrderItem = require("../models/orders/orderItem");
+const { default: axios } = require("axios");
+const Admin = require("../models/admin/admin")
+const Seller = require("../models/seller/sellerModels")
+const ShiprocketDetail = require("../models/orders/shiprocketDetail");
+const VariantInventory = require("../models/products/variantInventory");
 
 // exports.newOrder = async function (req, res) {
 //   try {
@@ -342,8 +353,9 @@ const orderModel = require("../models/orders/orderModels");
 //     );
 //   }
 // };
+
 // ============= working order API
-exports.newOrder = async function (req, res) {
+module.exports.newOrder = async function (req, res) {
   try {
     let user_id = req.user_id;
     let data = req.body;
@@ -406,10 +418,10 @@ exports.newOrder = async function (req, res) {
           product_name: products[i].name,
           price:
             products[i]?.price *
-              cart_items.items.filter(
-                (data) =>
-                  data.product_id.toString() == products[i]._id.toString()
-              )[0]["quantity"] || 1,
+            cart_items.items.filter(
+              (data) =>
+                data.product_id.toString() == products[i]._id.toString()
+            )[0]["quantity"] || 1,
 
           product_id: products[i]._id.toString(),
           quantity: cart_items.items.filter(
@@ -512,11 +524,11 @@ exports.newOrder = async function (req, res) {
       error.message
     );
   }
-};
+}
 
 // ===========
 
-(exports.getSingleOrderDetails = async (req, res) => {
+module.exports.getSingleOrderDetails = async (req, res) => {
   try {
     const singleOrder = await Order.findById(req.params.id);
 
@@ -545,73 +557,76 @@ exports.newOrder = async function (req, res) {
       error.message
     );
   }
-}),
-  // get all order of the user
-  (exports.myOrders = async (req, res) => {
-    try {
-      const FetchedOrders = await Order.findOne();
+}
 
-      // Check if orders are found
-      if (!FetchedOrders) {
-        return response.commonErrorResponse(
-          res,
-          ErrorCode.NOT_FOUND,
-          {},
-          ErrorMessage.NOT_FOUND
-        );
-      } else {
-        // Return success response with orders
-        return response.commonResponse(
-          res,
-          SuccessCode.SUCCESS,
-          FetchedOrders,
-          SuccessMessage.DETAIL_GET
-        );
-      }
-    } catch (error) {
+// get all order of the user
+module.exports.myOrders = async (req, res) => {
+  try {
+    const FetchedOrders = await Order.findOne();
+
+    // Check if orders are found
+    if (!FetchedOrders) {
       return response.commonErrorResponse(
         res,
-        ErrorCode.INTERNAL_ERROR,
+        ErrorCode.NOT_FOUND,
         {},
-        error.message
+        ErrorMessage.NOT_FOUND
+      );
+    } else {
+      // Return success response with orders
+      return response.commonResponse(
+        res,
+        SuccessCode.SUCCESS,
+        FetchedOrders,
+        SuccessMessage.DETAIL_GET
       );
     }
-  }),
-  /* ======================ADMIN================== */
-  // Get All Orders ---ADMIN
-  (exports.getAllOrders = async (req, res) => {
-    try {
-      const orders = await Order.find();
+  } catch (error) {
+    return response.commonErrorResponse(
+      res,
+      ErrorCode.INTERNAL_ERROR,
+      {},
+      error.message
+    );
+  }
+}
 
-      if (!orders) {
-        return response.commonErrorResponse(
-          res,
-          ErrorCode.NOT_FOUND,
-          {},
-          ErrorMessage.NOT_FOUND
-        );
-      }
+/* ======================ADMIN================== */
+// Get All Orders ---ADMIN
+module.exports.getAllOrders = async (req, res) => {
+  try {
+    const orders = await Order.find();
 
-      let totalAmount = 0;
-      orders.forEach((order) => {
-        totalAmount += order.totalPrice;
-      });
-
-      res.status(200).json({
-        success: true,
-        orders,
-        totalAmount,
-      });
-    } catch (error) {
+    if (!orders) {
       return response.commonErrorResponse(
         res,
-        ErrorCode.INTERNAL_ERROR,
+        ErrorCode.NOT_FOUND,
         {},
-        error.message
+        ErrorMessage.NOT_FOUND
       );
     }
-  });
-exports.updateOrder = async (req, res) => {
+
+    let totalAmount = 0;
+    orders.forEach((order) => {
+      totalAmount += order.totalPrice;
+    });
+
+    res.status(200).json({
+      success: true,
+      orders,
+      totalAmount,
+    });
+  } catch (error) {
+    return response.commonErrorResponse(
+      res,
+      ErrorCode.INTERNAL_ERROR,
+      {},
+      error.message
+    );
+  }
+}
+
+module.exports.updateOrder = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id);
 
@@ -655,7 +670,7 @@ exports.updateOrder = async (req, res) => {
       error.message
     );
   }
-};
+}
 
 async function updateStock(id, quantity) {
   const product = await Product.findById(id);
@@ -664,7 +679,7 @@ async function updateStock(id, quantity) {
 }
 
 // Delete Order ---ADMIN
-exports.deleteOrder = async (req, res) => {
+module.exports.deleteOrder = async (req, res) => {
   const order = await Order.findById(req.params.id);
 
   if (!order) {
@@ -681,9 +696,9 @@ exports.deleteOrder = async (req, res) => {
   res.status(200).json({
     success: true,
   });
-};
+}
 
-exports.getOrderBySellerId = async function (req, res) {
+module.exports.getOrderBySellerId = async function (req, res) {
   try {
     let seller_id = req.seller_id;
 
@@ -703,9 +718,9 @@ exports.getOrderBySellerId = async function (req, res) {
       error.message
     );
   }
-};
+}
 
-exports.orderHistory = async function (req, res) {
+module.exports.orderHistory = async function (req, res) {
   try {
     let user_id = req.user_id;
     let allOrder = await orderModel.find({ user_id: user_id });
@@ -732,4 +747,464 @@ exports.orderHistory = async function (req, res) {
       error.message
     );
   }
-};
+}
+
+module.exports.placeClothingOrder = async (req, res) => {
+  try {
+    const {
+      productId,
+      variantId,
+      sizeVariantId,
+      selectedCourier,
+      deliveryCharge,
+      offeredPrice,
+      totalAmont,
+      deliveryAddress,
+      quantity,
+      is_cod
+    } = req.body;
+
+    const productDetail = await productModel.findOne({ _id: productId });
+    if (!productDetail) {
+      return res.status(400).send({ success: false, message: "Wrong details provided" });
+    }
+
+    const variantDetail = await Variant.findOne({ _id: variantId });
+    if (!variantDetail) {
+      return res.status(400).send({ success: false, message: "Wrong details provided" });
+    }
+
+    const sizeVariantDetail = await SizeVariant.findOne({ _id: sizeVariantId });
+    if (!sizeVariantDetail) {
+      return res.status(400).send({ success: false, message: "Wrong details provided" });
+    }
+
+    if (offeredPrice != sizeVariantDetail.offered_price) {
+      return res.status(400).send({ success: false, message: "Wrong details provided" });
+    }
+
+    if (((offeredPrice * quantity) + deliveryCharge) != totalAmont) {
+      return res.status(400).send({ success: false, message: "Wrong details provided" });
+    }
+
+    const sizeVariantInventoryDetail = await SizeVariantInventory.findOne({ size_variant_id: sizeVariantDetail._id });
+    if (sizeVariantInventoryDetail.available_quantity < quantity) {
+      return res.status(400).send({ success: false, message: "Wrong details provided" });
+    }
+
+    const address = await Address.findOne({ _id: deliveryAddress._id });
+    if (!address) {
+      return res.status(400).send({ success: false, message: "Wrong details provided" });
+    }
+
+    const newOrder = new Order({
+      user_id: req.user._id,
+
+      delivery_address_id: address._id,
+      delivery_customer_name: address.name,
+      delivery_custome_last_name: address.last_name,
+      delivery_address: address.address,
+      delivery_address_2: address.address_2,
+      delivery_city: address.city,
+      delivery_pincode: address.pincode,
+      delivery_state: address.state,
+      delivery_country: address.country,
+      delivery_email: address.email,
+      delivery_phone: address.phone_number,
+
+      totalItems: 1,
+      totalQuantity: quantity,
+      subTotalPrice: (offeredPrice * quantity),
+      deliveryCharge: deliveryCharge,
+      totalAmount: totalAmont,
+
+      is_cod: is_cod
+    })
+
+    const savedOrder = await newOrder.save();
+
+    // generate short order id of numbers
+    const short_order_id = Date.now();
+
+    const newOrderItem = new OrderItem({
+      order_id: savedOrder._id,
+      short_order_id: short_order_id,
+
+      price: offeredPrice,
+      quantity: savedOrder.totalQuantity,
+      subTotalPrice: savedOrder.subTotalPrice,
+      deliveryCharge: savedOrder.deliveryCharge,
+      totalAmount: savedOrder.totalAmount,
+
+      is_cod: savedOrder.is_cod,
+
+      product_id: productDetail._id,
+      variant_id: variantDetail._id,
+      sizeVariantId: sizeVariantDetail._id,
+    })
+
+    const savedOrderItem = await newOrderItem.save();
+
+    // Update available_quantity, ordered_quantity
+    sizeVariantInventoryDetail.available_quantity -= Number(quantity);
+    sizeVariantInventoryDetail.ordered_quantity = Number(sizeVariantInventoryDetail.ordered_quantity) + Number(quantity);
+    await sizeVariantInventoryDetail.save();
+
+    if (is_cod == 1) {
+      // if is_cod == 1, then place order and create delivery using shiprocket
+      return res.status(201).send({ success: true, message: "Order placed", savedOrder });
+    } else {
+      // prepaid payment order and send to frontend
+      // amount is savedOrder.totalAmount - for creating order
+
+      return res.status(201).send({ success: true, message: "Order created", savedOrder });
+    }
+  } catch (error) {
+    console.log("Error while placing clothing order", error);
+    return res.status(500).send({ success: false, message: "Internal server error" });
+  }
+}
+
+module.exports.paymentSuccess = async (req, res) => {
+  try {
+    const { orderDetail, selectedCourier } = req.body;
+    // console.log(orderDetail);
+
+    // Verify payment success - if success then update to order, else failed order placed
+
+    const order = await Order.findOne({ _id: orderDetail._id });
+    if (!order) {
+      return res.status(400).send({ success: false, message: "Wrong details provided" });
+    }
+
+    order.is_order_placed = true;
+    order.orderPlacedAt = Date.now();
+    order.is_payment_success = true;
+    order.order_payment_type = "UPI"; // payment method
+    order.transactionId = Date.now(); // add transaction id
+    order.paidAt = Date.now();
+
+    await order.save();
+
+    // Generate invoice id 
+
+    const orderItemDetail = await OrderItem.findOne({ order_id: order._id });
+    orderItemDetail.is_payment_success = true;
+    orderItemDetail.order_payment_type = order.order_payment_type;
+    orderItemDetail.transactionId = order.transactionId;
+    orderItemDetail.paidAt = order.paidAt;
+    orderItemDetail.invoice_id = Date.now();
+
+    await orderItemDetail.save();
+
+    const sizeVariantDetail = await SizeVariant.findOne({
+      _id: orderItemDetail.
+        sizeVariantId
+    });
+    const productDetail = await productModel.findOne({ _id: orderItemDetail.product_id })
+    let seller;
+    if (productDetail.is_admin_product) {
+      seller = await Admin.findOne({ _id: productDetail.admin_id })
+    } else {
+      seller = await Seller.findOne({ _id: productDetail.seller_id })
+    }
+
+    // Place order with shiprocket
+    const authRespose = await axios.post(`${process.env.SHIPROCKET_BASE_URL}/auth/login`, {
+      email: process.env.SHIPROCKET_EMAIL,
+      password: process.env.SHIPROCKET_PASSWORD,
+    })
+
+    const orderUrl = `${process.env.SHIPROCKET_BASE_URL}/orders/create/adhoc`
+
+    const utcDate = order.orderPlacedAt;
+    const istDate = new Date(utcDate.getTime() + (5.5 * 60 * 60 * 1000));
+    const formattedDate = istDate.toISOString().split('T')[0];
+    // console.log(formattedDate); // Output: 2024-10-24
+
+    // orderPlacedAt, short_order_id, 
+    const orderData = {
+      order_id: orderItemDetail.short_order_id,
+      order_date: formattedDate,
+
+      // pickup_location: `${seller.pickup_id}`,
+      // pickup_location: `${4866555}`,
+      pickup_location: seller.pickup_location,
+
+      billing_customer_name: order.delivery_customer_name,
+      billing_last_name: order.delivery_custome_last_name,
+      billing_address: order.delivery_address,
+      billing_city: order.delivery_city,
+      billing_pincode: order.delivery_pincode,
+      billing_state: order.delivery_state,
+      billing_country: order.delivery_country,
+      billing_email: order.delivery_email,
+      billing_phone: order.delivery_phone,
+      shipping_is_billing: true,
+
+      order_items: [
+        {
+          name: productDetail.product_name,
+          sku: sizeVariantDetail.sku,
+          hsn: sizeVariantDetail.hsn,
+          units: orderItemDetail.quantity,
+          selling_price: orderItemDetail.price,
+        }
+      ],
+
+      payment_method: "Prepaid",
+      sub_total: orderItemDetail.subTotalPrice,
+
+      // sizevariantdetail
+      length: sizeVariantDetail.length,
+      breadth: sizeVariantDetail.breadth,
+      height: sizeVariantDetail.height,
+      weight: sizeVariantDetail.weight,
+
+      courier_id: selectedCourier.courier_company_id,
+    };
+
+    // console.log(orderData)
+
+    const response = await axios.post(orderUrl, orderData, {
+      headers: {
+        'Authorization': `Bearer ${authRespose.data.token}`, // Replace with your access token
+        'Content-Type': 'application/json'
+      }
+    })
+
+    // console.log(response);
+    // console.log(response?.data);
+    if (response?.data.status_code) {
+      const newShiprocketDetail = new ShiprocketDetail({
+        ...response?.data,
+        courier_id: selectedCourier.courier_company_id,
+        order_item_id: orderItemDetail._id
+      })
+
+      await newShiprocketDetail.save();
+    }
+
+    return res.status(200).send({ success: true, message: "Payment success! Order plcaed" });
+  } catch (error) {
+    console.log("Error while placing clothing order", error);
+    // console.log(error?.response?.data);
+    return res.status(500).send({ success: false, message: "Internal server error" });
+  }
+}
+
+module.exports.placeDefaultCodOrder = async (req, res) => {
+  try {
+    let { productId,
+      variantId,
+      quantity,
+      is_cod,
+
+      selectedCourier,
+      deliveryAddress,
+
+      offeredPrice,
+      subtotalPrice,
+      deliveryCharge,
+      totalAmont } = req.body;
+
+    // Find product information
+    const productDetail = await Product.findOne({ _id: productId });
+    if (!productDetail) {
+      return res.status(400).send({ success: false, message: "Wrong detail provided" })
+    }
+
+    // Find variant information
+    const variantDetail = await Variant.findOne({ _id: variantId });
+    if (!variantDetail) {
+      return res.status(400).send({ success: false, message: "Wrong detail provided" })
+    }
+
+    // Find variant inventory information
+    const variantInventoryDetail = await VariantInventory.findOne({ product_variant_id: variantId });
+    if (!variantInventoryDetail) {
+      return res.status(400).send({ success: false, message: "Wrong detail provided" })
+    }
+
+    // If available quantity less than order quantity
+    if (variantInventoryDetail.available_quantity < quantity) {
+      return res.status(400).send({ success: false, message: `Only ${variantInventoryDetail.available_quantity} product remaining` })
+    }
+
+    // Check for address confirmation
+    const deliveryAddressDetail = await addressModel.findOne({ _id: deliveryAddress._id })
+    if (!deliveryAddressDetail) {
+      return res.status(400).send({ success: false, message: "Wrong detail provided" })
+    }
+
+    if (offeredPrice != variantDetail.offered_price) {
+      return res.status(400).send({ success: false, message: "Offered price do not match" })
+    }
+
+    if ((offeredPrice * quantity) != subtotalPrice) {
+      return res.status(400).send({ success: false, message: "Subtotal price do not match" })
+    }
+
+    if (is_cod === 0) {
+      if (selectedCourier.freight_charge != deliveryCharge) {
+        return res.status(400).send({ success: false, message: "Delivery charge do not match" })
+      }
+    } else {
+      if ((selectedCourier.freight_charge + selectedCourier.cod_charges) != deliveryCharge) {
+        return res.status(400).send({ success: false, message: "Delivery charge do not match" })
+      }
+    }
+
+    if ((deliveryCharge + subtotalPrice) != totalAmont) {
+      return res.status(400).send({ success: false, message: "Total price do not match" })
+    }
+
+    // Placing order
+    // Creating new Order
+    const newOrder = new Order({
+      user_id: req.user._id,
+
+      delivery_address_id: deliveryAddressDetail._id,
+      delivery_customer_name: deliveryAddressDetail.name,
+      delivery_custome_last_name: deliveryAddressDetail.last_name,
+      delivery_address: deliveryAddressDetail.address,
+      delivery_address_2: deliveryAddressDetail.address_2,
+      delivery_city: deliveryAddressDetail.city,
+      delivery_pincode: deliveryAddressDetail.pincode,
+      delivery_state: deliveryAddressDetail.state,
+      delivery_country: deliveryAddressDetail.country,
+      delivery_email: deliveryAddressDetail.email,
+      delivery_phone: deliveryAddressDetail.phone_number,
+
+      totalItems: 1,
+      totalQuantity: quantity,
+      subTotalPrice: subtotalPrice,
+      deliveryCharge: deliveryCharge,
+      totalAmount: totalAmont,
+
+      is_order_placed: true,
+      orderPlacedAt: Date.now(),
+
+      is_cod: is_cod,
+    })
+
+    const savedOrder = await newOrder.save();
+
+    // generate short order id of numbers
+    const short_order_id = Date.now();
+    const randomNumber = Math.floor(10000 + Math.random() * 90000);
+    // Generating invoice number
+    const invoice_id = Date.now() + randomNumber;
+
+    // Creating new order item
+    const newOrderItem = new OrderItem({
+      order_id: savedOrder._id,
+      short_order_id: short_order_id,
+      invoice_id: invoice_id,
+
+      price: offeredPrice,
+      quantity: savedOrder.totalQuantity,
+      subTotalPrice: savedOrder.subTotalPrice,
+      deliveryCharge: savedOrder.deliveryCharge,
+      totalAmount: savedOrder.totalAmount,
+
+      is_cod: savedOrder.is_cod,
+
+      product_id: productDetail._id,
+      variant_id: variantDetail._id
+    })
+
+    const savedOrderItem = await newOrderItem.save();
+
+    // Update available_quantity, ordered_quantity
+    variantInventoryDetail.available_quantity = Number(variantInventoryDetail.available_quantity) - Number(quantity);
+    variantInventoryDetail.ordered_quantity = Number(variantInventoryDetail.ordered_quantity) + Number(quantity);
+    await variantInventoryDetail.save();
+
+    // Place order with shiprocket
+    // Getting auth token from shiprocket
+    const authRespose = await axios.post(`${process.env.SHIPROCKET_BASE_URL}/auth/login`, {
+      email: process.env.SHIPROCKET_EMAIL,
+      password: process.env.SHIPROCKET_PASSWORD,
+    })
+
+    const orderUrl = `${process.env.SHIPROCKET_BASE_URL}/orders/create/adhoc`
+
+    const orderDate = new Date(savedOrder.orderPlacedAt).toLocaleDateString('en-CA');
+
+    let seller;
+    if (productDetail.is_admin_product) {
+      seller = await Admin.findOne({ _id: productDetail.admin_id })
+    } else {
+      seller = await Seller.findOne({ _id: productDetail.seller_id })
+    }
+
+    // creating data for placing order with shiprocket
+    const orderData = {
+      order_id: savedOrderItem.short_order_id,
+      order_date: orderDate,
+      invoice_number: savedOrderItem.invoice_id,
+
+      pickup_location: seller.pickup_location,
+
+      billing_customer_name: savedOrder.delivery_customer_name,
+      billing_last_name: savedOrder.delivery_custome_last_name,
+      billing_address: savedOrder.delivery_address,
+      billing_address_2: savedOrder.delivery_address_2,
+      billing_city: savedOrder.delivery_city,
+      billing_pincode: savedOrder.delivery_pincode,
+      billing_state: savedOrder.delivery_state,
+      billing_country: savedOrder.delivery_country,
+      billing_email: savedOrder.delivery_email,
+      billing_phone: savedOrder.delivery_phone,
+      shipping_is_billing: true,
+
+      order_items: [
+        {
+          name: productDetail.product_name,
+          sku: variantDetail.sku,
+          hsn: variantDetail.hsn,
+          units: quantity,
+          selling_price: offeredPrice,
+        }
+      ],
+
+      payment_method: "COD",
+      sub_total: subtotalPrice,
+
+      
+      length: variantDetail.length,
+      breadth: variantDetail.breadth,
+      height: variantDetail.height,
+      weight: variantDetail.weight,
+
+      courier_id: selectedCourier.courier_company_id,
+    };
+
+    // console.log(orderData)
+
+    // Placing order with shiprocket
+    const response = await axios.post(orderUrl, orderData, {
+      headers: {
+        'Authorization': `Bearer ${authRespose.data.token}`,
+        'Content-Type': 'application/json'
+      }
+    })
+
+    // Saving order detail
+    if (response?.data.status_code) {
+      const newShiprocketDetail = new ShiprocketDetail({
+        ...response?.data,
+        courier_id: selectedCourier.courier_company_id,
+        order_item_id: savedOrderItem._id
+      })
+
+      await newShiprocketDetail.save();
+    }
+
+    return res.status(201).send({ success: true, message: "Payment success! Order plcaed" });
+  } catch (error) {
+    console.log("Error while placing clothing order", error);
+    return res.status(500).send({ success: false, message: "Internal server error" });
+  }
+}

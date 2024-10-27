@@ -88,6 +88,15 @@ const sellerSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    pickup_id: {
+        type: Number
+    },
+    rto_address_id: {
+        type: Number
+    },
+    pickup_location: {
+        type: String
+    },
 }, { timestamps: true, });
 
 // generating jwt token

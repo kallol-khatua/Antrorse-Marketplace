@@ -12,7 +12,8 @@ const VariantInventory = require("../models/products/variantInventory")
 const Variant = require("../models/products/variant")
 
 const SizeVariant = require("../models/products/sizeVariant")
-const SizeVariantInventory = require("../models/products/sizeVariantInventory")
+const SizeVariantInventory = require("../models/products/sizeVariantInventory");
+const Product = require("../models/products/product");
 
 module.exports.AddProduct = async function (req, res) {
   try {
@@ -569,6 +570,10 @@ module.exports.addFoodsAndBeveragesProduct = async (req, res) => {
     for (let i = 0; i < data.variants.length; i++) {
       // console.log(data.variants[i])
 
+      let sku = "SKU";
+      sku += Math.floor(10000 + Math.random() * 90000);
+      let hsn = Math.floor(10000000 + Math.random() * 90000000);
+
       let newVariant = new Variant({
         product_id: savedProduct._id,
         actual_price: data.variants[i].actual_price,
@@ -578,6 +583,13 @@ module.exports.addFoodsAndBeveragesProduct = async (req, res) => {
         expiration_date: data.variants[i].expiration_date,
         calories: data.variants[i].calories,
         packaging_type: data.variants[i].packaging_type,
+
+        length: data.variants[i].length,
+        breadth: data.variants[i].breadth,
+        height: data.variants[i].height,
+        weight: data.variants[i].weight,
+        sku: sku,
+        hsn: hsn,
       })
       if (data.quantity_type === "weight") {
         newVariant.weight_per_unit = data.variants[i].weight_per_unit,
@@ -683,12 +695,22 @@ module.exports.addClothingsProduct = async (req, res) => {
 
       for (let j = 0; j < sizeVariants.length; j++) {
         // console.log(sizeVariants[j])
+        let sku = "SKU";
+        sku += Math.floor(10000 + Math.random() * 90000);
+        let hsn = Math.floor(10000000 + Math.random() * 90000000);
 
         const newSizeVariant = new SizeVariant({
           product_variant_id: savedVariant._id,
           size: sizeVariants[j].size,
           actual_price: sizeVariants[j].actual_price,
           offered_price: sizeVariants[j].offered_price,
+
+          length: sizeVariants[j].length,
+          breadth: sizeVariants[j].breadth,
+          height: sizeVariants[j].height,
+          weight: sizeVariants[j].weight,
+          sku: sku,
+          hsn: hsn,
         })
 
         // save size variant to db
@@ -744,15 +766,23 @@ module.exports.addDefaultProduct = async (req, res) => {
 
     for (let i = 0; i < data.variants.length; i++) {
       // console.log(data.variants[i])
+      let sku = "SKU";
+      sku += Math.floor(10000 + Math.random() * 90000);
+      let hsn = Math.floor(10000000 + Math.random() * 90000000);
 
       let newVariant = new Variant({
         product_id: savedProduct._id,
         actual_price: data.variants[i].actual_price,
         offered_price: data.variants[i].offered_price,
         min_order_quantity: data.variants[i].min_order_quantity,
-      })
 
-      // console.log(newVariant)
+        length: data.variants[i].length,
+        breadth: data.variants[i].breadth,
+        height: data.variants[i].height,
+        weight: data.variants[i].weight,
+        sku: sku,
+        hsn: hsn,
+      })
 
       // Save new variant to the db
       const savedVariant = await newVariant.save();
@@ -788,6 +818,7 @@ module.exports.addDefaultAdminProduct = async (req, res) => {
       is_admin_product: true,
       admin_id: req.admin._id,
       isApproved: true,
+      isActive: true,
 
       generic_name: data.generic_name,
       inventory_location: data.inventory_location,
@@ -805,12 +836,22 @@ module.exports.addDefaultAdminProduct = async (req, res) => {
 
     for (let i = 0; i < data.variants.length; i++) {
       // console.log(data.variants[i])
+      let sku = "SKU";
+      sku += Math.floor(10000 + Math.random() * 90000);
+      let hsn = Math.floor(10000000 + Math.random() * 90000000);
 
       let newVariant = new Variant({
         product_id: savedProduct._id,
         actual_price: data.variants[i].actual_price,
         offered_price: data.variants[i].offered_price,
         min_order_quantity: data.variants[i].min_order_quantity,
+
+        length: data.variants[i].length,
+        breadth: data.variants[i].breadth,
+        height: data.variants[i].height,
+        weight: data.variants[i].weight,
+        sku: sku,
+        hsn: hsn,
       })
 
       // console.log(newVariant)
@@ -851,6 +892,7 @@ module.exports.addFoodsAndBeveragesAdminProduct = async (req, res) => {
       is_admin_product: true,
       admin_id: req.admin._id,
       isApproved: true,
+      isActive: true,
 
       generic_name: data.generic_name,
       pack_of: data.pack_of,
@@ -869,6 +911,9 @@ module.exports.addFoodsAndBeveragesAdminProduct = async (req, res) => {
 
     for (let i = 0; i < data.variants.length; i++) {
       // console.log(data.variants[i])
+      let sku = "SKU";
+      sku += Math.floor(10000 + Math.random() * 90000);
+      let hsn = Math.floor(10000000 + Math.random() * 90000000);
 
       let newVariant = new Variant({
         product_id: savedProduct._id,
@@ -879,6 +924,13 @@ module.exports.addFoodsAndBeveragesAdminProduct = async (req, res) => {
         expiration_date: data.variants[i].expiration_date,
         calories: data.variants[i].calories,
         packaging_type: data.variants[i].packaging_type,
+
+        length: data.variants[i].length,
+        breadth: data.variants[i].breadth,
+        height: data.variants[i].height,
+        weight: data.variants[i].weight,
+        sku: sku,
+        hsn: hsn,
       })
       if (data.quantity_type === "weight") {
         newVariant.weight_per_unit = data.variants[i].weight_per_unit,
@@ -926,6 +978,7 @@ module.exports.addClothingsAdminProduct = async (req, res) => {
       is_admin_product: true,
       admin_id: req.admin._id,
       isApproved: true,
+      isActive: true,
 
       generic_name: data.generic_name,
       pack_of: data.pack_of,
@@ -982,12 +1035,22 @@ module.exports.addClothingsAdminProduct = async (req, res) => {
 
       for (let j = 0; j < sizeVariants.length; j++) {
         // console.log(sizeVariants[j])
+        let sku = "SKU";
+        sku += Math.floor(10000 + Math.random() * 90000);
+        let hsn = Math.floor(10000000 + Math.random() * 90000000);
 
         const newSizeVariant = new SizeVariant({
           product_variant_id: savedVariant._id,
           size: sizeVariants[j].size,
           actual_price: sizeVariants[j].actual_price,
           offered_price: sizeVariants[j].offered_price,
+
+          length: sizeVariants[j].length,
+          breadth: sizeVariants[j].breadth,
+          height: sizeVariants[j].height,
+          weight: sizeVariants[j].weight,
+          sku: sku,
+          hsn: hsn,
         })
 
         // save size variant to db
@@ -1007,6 +1070,82 @@ module.exports.addClothingsAdminProduct = async (req, res) => {
     return res.status(201).send({ success: true, message: "Product added successfully" });
   } catch (err) {
     console.log("Error while adding clothings product", err);
+    return res.status(500).send({ success: false, message: "Internal server error" });
+  }
+}
+
+module.exports.getProductCategory = async (req, res) => {
+  try {
+    let { productId } = req.query;
+
+    const productDetail = await Product.findOne({ _id: productId })
+    return res.status(200).send({ success: true, message: "Product category found", productDetail });
+  } catch (error) {
+    console.log("Error while fetching product category");
+    return res.status(500).send({ success: false, message: "Internal server error" });
+  }
+}
+
+module.exports.getClothingOrderDetail = async (req, res) => {
+  try {
+    let { productId, variantId, sizeVariantId } = req.query;
+    const productDetail = await Product.findOne({ _id: productId })
+
+    const variantDetail = await Variant.findOne({ _id: variantId, product_id: productDetail._id })
+
+    const sizeVariantDetail = await SizeVariant.findOne({ _id: sizeVariantId, product_variant_id: variantDetail._id });
+
+    const sizevariantInventory = await SizeVariantInventory.findOne({ size_variant_id: sizeVariantDetail._id })
+
+    return res.status(200).send({ success: true, message: "Details fetched", productDetail, variantDetail, sizeVariantDetail, sizevariantInventory });
+  } catch (error) {
+    console.log("Error while fetching Clothing order detail");
+    return res.status(500).send({ success: false, message: "Internal server error" });
+  }
+}
+
+module.exports.getSellerDetail = async (req, res) => {
+  try {
+    let { productId } = req.query;
+
+    const details = await Product.findOne({ _id: productId })
+    if (details.is_admin_product) {
+      const adminDetails = await Product.findOne({ _id: productId }).populate("admin_id")
+      return res.status(200).send({ success: true, message: "Details fetched", adminDetails: adminDetails.admin_id });
+    } else {
+      const sellerDetails = await Product.findOne({ _id: productId }).populate("seller_id")
+      return res.status(200).send({
+        success: true, message: "Details fetched", sellerDetails: sellerDetails.
+          seller_id
+      });
+    }
+  } catch (error) {
+    console.log("Error while fetching seller detail for product id");
+    return res.status(500).send({ success: false, message: "Internal server error" });
+  }
+}
+
+module.exports.getDefaultOrderDetail = async (req, res) => {
+  try {
+    const { productId, variantId } = req.query;
+    const productDetail = await Product.findOne({ _id: productId });
+    if (!productDetail) {
+      return res.status(400).send({ success: false, message: "Wrong detail provided" })
+    }
+
+    const variantDetail = await Variant.findOne({ _id: variantId });
+    if (!variantDetail) {
+      return res.status(400).send({ success: false, message: "Wrong detail provided" })
+    }
+
+    const variantInventoryDetail = await VariantInventory.findOne({ product_variant_id: variantId });
+    if (!variantInventoryDetail) {
+      return res.status(400).send({ success: false, message: "Wrong detail provided" })
+    }
+
+    return res.status(200).send({ success: true, message: "Details fetched", productDetail, variantDetail, variantInventoryDetail });
+  } catch (error) {
+    console.log("Error while fetching seller detail for product id");
     return res.status(500).send({ success: false, message: "Internal server error" });
   }
 }

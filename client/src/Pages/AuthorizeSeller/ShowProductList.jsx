@@ -36,7 +36,7 @@ function ShowProductList() {
 
   const getSellerProducts = async () => {
     try {
-      const url = `/admin/get-seller-products`;
+      const url = `/admin/get-seller-products?sellerId=${sellerId}`;
       const response = await AdminAxiosInstance.get(url);
 
       if (response.status === 200) {
@@ -73,8 +73,8 @@ function ShowProductList() {
               <>
                 {/* <ProductCard key={index} product={product} /> */}
                 <ShowProductCard
-                  key={index}
                   product={product}
+                  key={product._id}
                   getSellerProducts={getSellerProducts}
                 />
               </>

@@ -37,8 +37,14 @@ route.get("/due-authorization-seller", adminController.dueAuthorizationSeller)
 
 route.get("/get-seller-info", adminController.getSellerInfo);
 
+// Route to get all products of seller
+route.get("/get-seller-products", adminController.getSellerProducts);
+
 // Route to handle mark seller pickup lcoation as verified
 route.post("/authorize-seller/mark-seller-pickup-location-verified", verifyAdminAuthToken, adminController.markSellerPickupLocationAsVerified)
+
+// Route to reject product
+route.post("/authorize-seller/reject-product", verifyAdminAuthToken, adminController.rejectProduct)
 
 route.post("/approve-seller", verifyAdminAuthToken, adminController.approveSeller)
 route.post("/reject-seller", verifyAdminAuthToken, adminController.rejectSeller)

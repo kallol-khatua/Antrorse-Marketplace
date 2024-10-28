@@ -572,3 +572,57 @@ module.exports.markSellerPickupLocationAsVerified = async (req, res) => {
     return res.status(500).send({ success: false, message: "Internal server error" })
   }
 }
+
+// Controller to get all products of seller
+module.exports.getSellerProducts = async (req, res) => {
+  try {
+    const { sellerId } = req.query;
+
+    // const products = await Product.find({ seller_id: sellerId });
+    const products = await Product.aggregate([
+      {
+        $match: {
+          $and: [
+            {
+              seller_id: new mongoose.Types.ObjectId(sellerId)
+            },
+            {
+              isActive: true,
+            }, {
+              isApproved: false,
+            },
+            {
+              isRejected: false
+            }
+          ]
+        }
+      }
+    ])
+
+    return res.status(200).send({ success: true, message: "Seller products found", products });
+  } catch (error) {
+    console.log("Error while finding seller products", error);
+    return res.status(500).send({ success: false, message: "Internal server error" })
+  }
+}
+
+module.exports.rejectProduct = async (req, res) => {
+  try {
+    const { productId } = req.body;
+    const product = await Product.findOne({ _id: productId });
+
+    if (!product) {
+      return res.status(400).send({ success: false, message: "Product not found" });
+    }
+
+    product.isActive = false;
+    product.isRejected = true;
+
+    await product.save();
+
+    return res.status(200).send({ success: true, message: "Seller product rejected successfully" });
+  } catch (error) {
+    console.log("Error while finding seller products", error);
+    return res.status(500).send({ success: false, message: "Internal server error" })
+  }
+}

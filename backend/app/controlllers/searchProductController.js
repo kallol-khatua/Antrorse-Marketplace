@@ -371,3 +371,4 @@ module.exports.viewDefaultProductDetail = async (req, res) => {
         return res.status(500).send({ success: false, message: "Internal server error" });
     }
 }
+

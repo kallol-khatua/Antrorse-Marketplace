@@ -18,7 +18,7 @@ const SellerSignUp = () => {
     confirmPassword: "",
     mobile_number: "",
     isAcceptTermsAndConditions: true,
-    gst_number: "",
+    // gst_number: "",
     company_name: "",
   };
 
@@ -40,10 +40,10 @@ const SellerSignUp = () => {
     isAcceptTermsAndConditions: Yup.boolean().required(
       "Please accept Terms and Conditions"
     ),
-    gst_number: Yup.string()
-      .min(15, "GST number must be at least 15 characters")
-      .max(15, "GST number must be at most 15 characters")
-      .required("Please enter your company GST number"),
+    // gst_number: Yup.string()
+    //   .min(15, "GST number must be at least 15 characters")
+    //   .max(15, "GST number must be at most 15 characters")
+    //   .required("Please enter your company GST number"),
     company_name: Yup.string()
       .min(3, "Company name must be at least 3 characters")
       .required("Please enter your company name"),
@@ -245,7 +245,7 @@ const SellerSignUp = () => {
                   )}
                 </div>
 
-                <div className="flex flex-col gap-1">
+                {/* <div className="flex flex-col gap-1">
                   <label
                     htmlFor="gst_number"
                     className="text-sm font-medium text-gray-900"
@@ -267,7 +267,7 @@ const SellerSignUp = () => {
                       {errors.gst_number}
                     </p>
                   )}
-                </div>
+                </div> */}
 
                 <div className="flex items-start">
                   <div className="flex items-center h-5">

@@ -19,7 +19,7 @@ const AdminProductType = () => {
 
   const [productCategories, setProductCategories] = useState([
     "Foods & Beverages",
-    "Clothings",
+    // "Clothings",
     // "Footwears",
     // "Electronics",
     "Default",

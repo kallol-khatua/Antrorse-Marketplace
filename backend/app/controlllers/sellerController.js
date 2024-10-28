@@ -21,13 +21,13 @@ module.exports.sellerRegistration = async function (req, res) {
       return res.status(400).send({ success: false, message: "Please accept terms and conditions" })
     }
 
-    if (!data.gst_number) {
-      return res.status(400).send({ success: false, message: "GST number is required" });
-    }
+    // if (!data.gst_number) {
+    //   return res.status(400).send({ success: false, message: "GST number is required" });
+    // }
 
-    if (!validation.gstValidation(data.gst_number)) {
-      return res.status(400).send({ success: false, message: "GST number is not valid" });
-    }
+    // if (!validation.gstValidation(data.gst_number)) {
+    //   return res.status(400).send({ success: false, message: "GST number is not valid" });
+    // }
 
     if (!validation.isNonEmptyString(data.name)) {
       return res.status(400).send({ success: false, message: "Name is required" });
@@ -85,7 +85,7 @@ module.exports.sellerRegistration = async function (req, res) {
       password: hashedPassword,
       company_name: data.company_name,
       isAcceptTermsAndConditions: Boolean(data.isAcceptTermsAndConditions),
-      gst_number: data.gst_number,
+      // gst_number: data.gst_number,
     });
 
     let registeredSeller = await newSeller.save();
@@ -128,7 +128,7 @@ module.exports.sellerLogin = async function (req, res) {
       return res.status(400).send({ message: 'Invalid password.' });
     }
 
-    if (!seller.isActive || !seller.isApproved) {
+    if (!seller.isActive) {
       return res.status(400).send({ success: false, message: "Account is not active" })
     }
 
@@ -148,6 +148,7 @@ module.exports.createPickupLocation = async (req, res) => {
     const {
       pickup_location,
       address,
+      address_2,
       city,
       state,
       country,
@@ -160,44 +161,62 @@ module.exports.createPickupLocation = async (req, res) => {
       password: process.env.SHIPROCKET_PASSWORD,
     })
 
-    // console.log(authRespose.data.token)
-
     const data = {
       pickup_location,
       name: req.seller.name,
       email: req.seller.email,
       phone: req.seller.mobile_number,
       address,
+      address_2,
       city,
       state,
       country,
       pin_code,
     }
+
     const response = await axios.post(`${process.env.SHIPROCKET_BASE_URL}/settings/company/addpickup`, data, {
       headers: {
-        'Authorization': `Bearer ${authRespose.data.token}`, // Replace with your access token
+        'Authorization': `Bearer ${authRespose.data.token}`,
         'Content-Type': 'application/json'
       }
     });
 
     // console.log(response)
-    // console.log('Pickup location created successfully:', response.data);
+    // console.log(response.data);
 
     if (response.status === 200) {
       seller = req.seller;
       seller.pickup_id = response.data.pickup_id;
       seller.rto_address_id = response.data.address.rto_address_id;
+      seller.pickup_location = response.data.address.pickup_code;
+      seller.isPickUpLocationAdded = true;
 
       await seller.save();
-    }
 
-    return res.status(201).send({ success: true, message: "Pickup location created successfully" });
+      const newPickUplocation = new SellerPickupLocation({
+        seller_id: req.seller._id,
+        pickup_location,
+        address,
+        address_2,
+        city,
+        state,
+        country,
+        pin_code,
+      })
+
+      const savedPickupLocation = await newPickUplocation.save();
+
+      return res.status(201).send({ success: true, message: "Pickup location created successfully", savedPickupLocation });
+    } else {
+      return res.status(400).send({ success: false, message: "Some error occured" })
+    }
   } catch (error) {
-    // console.log("Error while creating seller pickup location", error.response);
     // console.log(error?.response?.data)
     if (error?.response?.data?.status_code === 422) {
-      return res.state(422).send({ success: false, message: error.response.data.message, errors: error.response.data.errors })
+      return res.status(422).send({ success: false, message: error.response.data.message, errors: error.response.data.errors })
     }
+
+    console.log("Error while creating seller pickup location", error);
     return res.status(500).send({ success: false, message: "Internal server error" });
   }
 }
@@ -661,6 +680,52 @@ module.exports.generateAwb = async (req, res) => {
     // While any error occures
     console.log("Error while getting all orders fro seller", error);
     console.log(error?.response?.data)
+    return res.status(500).send({ success: false, message: "Internal server error" });
+  }
+}
+
+module.exports.getSellerInfo = async (req, res) => {
+  try {
+    // const sellerData = await sellerModel.findOne({ _id: req.seller._id });
+    const sellerData = await sellerModel.aggregate([
+      {
+        $match: {
+          _id: new mongoose.Types.ObjectId(req.seller._id)
+        }
+      },
+      {
+        $lookup: {
+          from: 'sellerpickuplocations',
+          localField: '_id',
+          foreignField: 'seller_id',
+          as: 'sellerPickupLocation'
+        }
+      },
+      // {
+      //   $unwind: "$sellerPickupLocation"
+      // }
+    ])
+    return res.status(200).send({ success: true, message: "Sellor information found", sellerData: sellerData[0] });
+  } catch (error) {
+    console.log("Error while getting seller info", error);
+    return res.status(500).send({ success: false, message: "Internal server error" });
+  }
+}
+
+module.exports.applyForApproval = async (req, res) => {
+  try {
+    const sellerData = await sellerModel.findOne({ _id: req.seller._id });
+
+    if (!sellerData.isPickUpLocationAdded) {
+      return res.status(400).send({ success: false, message: "Please add pickup location" });
+    }
+
+    sellerData.isAppliedForApproval = true;
+    await sellerData.save();
+
+    return res.status(200).send({ success: true, message: "Sellor information found" });
+  } catch (error) {
+    console.log("Error while getting seller info", error);
     return res.status(500).send({ success: false, message: "Internal server error" });
   }
 }

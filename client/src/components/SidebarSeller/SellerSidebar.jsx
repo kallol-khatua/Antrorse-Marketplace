@@ -133,7 +133,7 @@ const SellerSidebar = () => {
                 {/* <!-- Menu Item seller end --> */}
 
                 {/* <!-- Menu Item Profile --> */}
-                {/* <NavLink
+                <NavLink
                   to="/seller/profile"
                   className={`group cursor-pointer relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-gray-200 duration-300 ease-in-out hover:bg-teal-800 dark:hover:bg-gray-600-4 text-lg   `}
                 >
@@ -154,8 +154,8 @@ const SellerSidebar = () => {
                       fill=""
                     />
                   </svg>
-                  Profile
-                </NavLink> */}
+                  My Profile
+                </NavLink>
                 {/* <!-- Menu Item Profile --> */}
 
                 {/* <!-- Menu Item addproduct --> */}
@@ -194,16 +194,6 @@ const SellerSidebar = () => {
                     />
                   </svg>
                   Add product
-                </NavLink>
-
-                <NavLink
-                  to="/seller/upload-document"
-                  className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-gray-200 duration-300 ease-in-out hover:bg-teal-800 dark:hover:bg-gray-600-4 text-lg  `}
-                >
-                  <div className="text-lg">
-                    <MdOutlineUploadFile />
-                  </div>
-                  Upload document
                 </NavLink>
 
                 {/* All products  */}
@@ -287,6 +277,16 @@ const SellerSidebar = () => {
                   Orders
                 </NavLink>
                 {/* <!-- Menu Item Tables --> */}
+
+                <NavLink
+                  to="/seller/upload-document"
+                  className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-gray-200 duration-300 ease-in-out hover:bg-teal-800 dark:hover:bg-gray-600-4 text-lg  `}
+                >
+                  <div className="text-lg">
+                    <MdOutlineUploadFile />
+                  </div>
+                  Upload document
+                </NavLink>
 
                 {/* <!-- Menu Item Settings --> */}
                 {/* <NavLink

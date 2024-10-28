@@ -470,7 +470,7 @@ function Defaultform() {
             );
           })}
 
-          <button
+          {/* <button
             className="flex items-center px-4 py-2 bg-slate-300 text-black font-bold rounded-md hover:bg-slate-400 transition duration-300 mt-3"
             type="button"
             onClick={addNewVariant}
@@ -488,7 +488,7 @@ function Defaultform() {
               />
             </svg>
             Add another variant
-          </button>
+          </button> */}
 
           <div className="mt-6 flex justify-center gap-3">
             <button

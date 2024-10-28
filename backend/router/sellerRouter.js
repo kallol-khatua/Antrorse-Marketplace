@@ -31,6 +31,7 @@ route.post("/sellerRegistration", sellerController.sellerRegistration)
 route.post("/sellerLogin", sellerController.sellerLogin)
 
 route.post("/create-pickup-location", verifySellerAuthToken, sellerController.createPickupLocation)
+route.post("/apply-for-approval", verifySellerAuthToken, sellerController.applyForApproval)
 
 route.get("/get-all-orders/generate-invoice", verifySellerAuthToken, sellerController.getAllOrders);
 route.post("/get-all-orders/generate-awb", verifySellerAuthToken, sellerController.generateAwb)
@@ -39,6 +40,8 @@ route.post("/sendOtpForRegistration", sellerController.sendOtpForRegistration)
 route.put("/updateProfile", auth.authorization, sellerController.updateProfile)
 route.put("/forgetPassword", sellerController.forgetPassword)
 route.put("/sellerKYC", auth.sellerAuth, sellerController.sellerKYC)
+
+route.get("/get-seller-info",verifySellerAuthToken, sellerController.getSellerInfo)
 
 route.post("/createOTPForForgetPassword", sellerController.createOTPForForgetPassword)
 module.exports = route

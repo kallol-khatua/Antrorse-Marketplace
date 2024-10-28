@@ -32,7 +32,9 @@ route.post("/login", adminController.login)
 route.get("/totalUser", adminController.totalUser)
 route.get("/totalSeller", adminController.totalSeller)
 route.get("/totalOrder", adminController.totalOrder)
+
 route.get("/due-authorization-seller", adminController.dueAuthorizationSeller)
+
 route.post("/approve-seller", verifyAdminAuthToken, adminController.approveSeller)
 route.post("/reject-seller", verifyAdminAuthToken, adminController.rejectSeller)
 route.get("/approve-seller-product", verifyAdminAuthToken, adminController.getProductForApproval);

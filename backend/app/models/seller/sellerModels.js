@@ -34,7 +34,7 @@ const sellerSchema = new mongoose.Schema({
     },
     gst_number: {
         type: String,
-        required: true,
+        // required: true,
         unique: true,
         trim: true
     },
@@ -45,6 +45,7 @@ const sellerSchema = new mongoose.Schema({
     pin_code: {
         type: Number,
     },
+
     // company_pan_number: {
     //     type: String
     // },
@@ -85,6 +86,15 @@ const sellerSchema = new mongoose.Schema({
         default: false
     },
     isRejected: {
+        type: Boolean,
+        default: false
+    },
+    isAppliedForApproval: {
+        type: Boolean,
+        default: false
+    },
+
+    isPickUpLocationAdded: {
         type: Boolean,
         default: false
     },

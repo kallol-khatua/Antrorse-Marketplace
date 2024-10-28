@@ -16,9 +16,10 @@ function AuthorizeSeller() {
       // console.log(response.data);
 
       if (response.status === 200) {
-        setSellers(response.data.sellers);
-
-        setIsLoading(false);
+        setTimeout(() => {
+          setSellers(response.data.sellers);
+          setIsLoading(false);
+        }, [250]);
       }
     } catch (error) {
       setIsLoading(false);

@@ -61,6 +61,8 @@ import DefaultProductDetails from "./Pages/DefaultProductDetails/DefaultProductD
 import AdminOrders from "./components/AdminOrders/AdminOrders";
 import FoodsAndBeveragesProduct from "./Pages/ProductDetails/FoodsAndBeveragesProduct";
 
+import ShowSellerInfo from "./Pages/AuthorizeSeller/ShowSellerInfo";
+
 function App() {
   return (
     <Router>
@@ -153,6 +155,10 @@ function App() {
           <Route path="dashboard" element={<Metric />} />
           <Route path="profile" element={<SellerAccount />} />
           <Route path="authorize-seller" element={<AuthorizeSeller />} />
+          <Route
+            path="authorize-seller/:sellerId"
+            element={<ShowSellerInfo />}
+          />
           <Route path="add-product" element={<AddAdminProduct />} />
           <Route
             path="approve-seller-product"

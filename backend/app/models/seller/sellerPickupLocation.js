@@ -7,13 +7,16 @@ const sellerPickupLocationSchema = new Schema({
         ref: "Seller",
         required: true
     },
-    name: {
+    pickup_location: {
         type: String,
         required: true
     },
     address: {
         type: String,
         required: true
+    },
+    address_2: {
+        type: String,
     },
     city: {
         type: String,
@@ -23,15 +26,11 @@ const sellerPickupLocationSchema = new Schema({
         type: String,
         required: true
     },
-    postcode: {
-        type: Number,
-        required: true
-    },
     country: {
         type: String,
         required: true
     },
-    contact_number: {
+    pin_code: {
         type: Number,
         required: true
     },

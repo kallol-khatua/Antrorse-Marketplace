@@ -296,10 +296,13 @@ module.exports.dueAuthorizationSeller = async (req, res) => {
     const sellers = await sellerModel.find({
       isEmailVerified: true,
       isMobileNumberVerified: true,
-      isActive: false,
+      isActive: true,
       isApproved: false,
-      isRejected: false
+      isRejected: false,
+      isPickUpLocationAdded: true,
+      isAppliedForApproval: true,
     })
+    
     return res.status(200).send({ success: true, message: "Sellers found", sellers })
   } catch (error) {
     console.log("error while getting due authorization seller", error);

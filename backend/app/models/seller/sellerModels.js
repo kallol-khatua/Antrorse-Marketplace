@@ -107,6 +107,10 @@ const sellerSchema = new mongoose.Schema({
     pickup_location: {
         type: String
     },
+    is_pickup_location_verified: {
+        type: Boolean,
+        default: false
+    },
 }, { timestamps: true, });
 
 // generating jwt token

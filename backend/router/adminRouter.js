@@ -35,6 +35,11 @@ route.get("/totalOrder", adminController.totalOrder)
 
 route.get("/due-authorization-seller", adminController.dueAuthorizationSeller)
 
+route.get("/get-seller-info", adminController.getSellerInfo);
+
+// Route to handle mark seller pickup lcoation as verified
+route.post("/authorize-seller/mark-seller-pickup-location-verified", verifyAdminAuthToken, adminController.markSellerPickupLocationAsVerified)
+
 route.post("/approve-seller", verifyAdminAuthToken, adminController.approveSeller)
 route.post("/reject-seller", verifyAdminAuthToken, adminController.rejectSeller)
 route.get("/approve-seller-product", verifyAdminAuthToken, adminController.getProductForApproval);

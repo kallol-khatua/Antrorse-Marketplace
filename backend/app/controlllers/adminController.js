@@ -16,6 +16,8 @@ const validation = require("../helper/validation");
 const Admin = require("../models/admin/admin");
 const OrderItem = require("../models/orders/orderItem");
 const { default: mongoose } = require("mongoose");
+const Product = require("../models/products/product");
+const Seller = require("../models/seller/sellerModels");
 
 module.exports.login = async function (req, res) {
   try {
@@ -302,7 +304,7 @@ module.exports.dueAuthorizationSeller = async (req, res) => {
       isPickUpLocationAdded: true,
       isAppliedForApproval: true,
     })
-    
+
     return res.status(200).send({ success: true, message: "Sellers found", sellers })
   } catch (error) {
     console.log("error while getting due authorization seller", error);
@@ -312,16 +314,24 @@ module.exports.dueAuthorizationSeller = async (req, res) => {
 
 module.exports.approveSeller = async (req, res) => {
   try {
-    const seller = await sellerModel.findOne({ _id: req.body.sellerId })
+    const { sellerId } = req.body;
+    const seller = await sellerModel.findOne({ _id: sellerId })
     if (!seller) {
       return res.status(400).send({ success: false, message: "Seller not found" })
     }
 
-    seller.isActive = true;
     seller.isApproved = true;
-    seller.account_status = "ACTIVE";
 
     await seller.save();
+
+    await Product.updateMany(
+      {
+        seller_id: seller._id
+      },
+      {
+        isApproved: true
+      }
+    )
 
     return res.status(200).send({ success: true, message: "Seller approved successfully" })
   } catch (error) {
@@ -332,15 +342,27 @@ module.exports.approveSeller = async (req, res) => {
 
 module.exports.rejectSeller = async (req, res) => {
   try {
-    const seller = await sellerModel.findOne({ _id: req.body.sellerId })
+    const { sellerId } = req.body;
+    const seller = await sellerModel.findOne({ _id: sellerId })
     if (!seller) {
       return res.status(400).send({ success: false, message: "Seller not found" })
     }
 
     seller.isRejected = true;
+    seller.isActive = false;
     seller.account_status = "REJECTED";
 
     await seller.save();
+
+    await Product.updateMany(
+      {
+        seller_id: seller._id
+      },
+      {
+        isActive: false,
+        isRejected: true
+      }
+    )
 
     return res.status(200).send({ success: true, message: "Seller rejected successfully" })
   } catch (error) {
@@ -490,6 +512,63 @@ module.exports.getOrdersForGenerateAWB = async (req, res) => {
     return res.status(200).send({ success: true, message: "Order items found", orderItems });
   } catch (error) {
     console.log("Error while getting order for generatinf awb number form admin", error);
+    return res.status(500).send({ success: false, message: "Internal server error" })
+  }
+}
+
+module.exports.getSellerInfo = async (req, res) => {
+  try {
+    let { sellerId } = req.query;
+
+    let sellerData = await sellerModel.aggregate([
+      {
+        $match: {
+          _id: new mongoose.Types.ObjectId(sellerId)
+        }
+      },
+      {
+        $lookup: {
+          from: 'sellerpickuplocations',
+          localField: '_id',
+          foreignField: 'seller_id',
+          as: 'sellerPickupLocation'
+        }
+      },
+      // {
+      //   $unwind: "$sellerPickupLocation"
+      // }
+    ])
+
+    sellerData = sellerData[0];
+    // console.log(sellerData)
+
+    if (!sellerData) {
+      return res.status(400).send({ success: false, message: "Seller not found" });
+    }
+
+    return res.status(200).send({ success: true, message: "Seller info found", sellerData });
+  } catch (error) {
+    console.log("Error while getting order for generatinf awb number form admin", error);
+    return res.status(500).send({ success: false, message: "Internal server error" })
+  }
+}
+
+// Controller to handle mark seller pickup lcoation as verified
+module.exports.markSellerPickupLocationAsVerified = async (req, res) => {
+  try {
+    const { sellerId } = req.body;
+    const seller = await sellerModel.findOne({ _id: sellerId });
+
+    if (!seller) {
+      return res.status(400).send({ success: false, message: "Seller not found" })
+    }
+
+    seller.is_pickup_location_verified = true;
+    await seller.save();
+
+    return res.status(200).send({ success: true, message: "Seller info found" });
+  } catch (error) {
+    console.log("Error while marking seller pickup location as verified", error);
     return res.status(500).send({ success: false, message: "Internal server error" })
   }
 }

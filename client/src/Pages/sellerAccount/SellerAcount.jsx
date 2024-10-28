@@ -5,38 +5,14 @@ import { TbReport } from "react-icons/tb";
 import { MdVerified } from "react-icons/md";
 import { toast } from "react-toastify";
 
+const ProfileItem = ({ label, value }) => (
+  <div>
+    <h3 className="text-sm font-medium text-gray-600">{label}</h3>
+    <p className="text-lg text-gray-800">{value}</p>
+  </div>
+);
+
 const SellerAccount = () => {
-  const [emailEditable, setEmailEditable] = useState(false);
-  const [mobileEditable, setMobileEditable] = useState(false);
-
-  const [email, setEmail] = useState("john.doe@example.com");
-  const [mobileNumber, setMobileNumber] = useState("123-456-7890");
-
-  const [emailSavedNotification, setEmailSavedNotification] = useState(false);
-  const [mobileSavedNotification, setMobileSavedNotification] = useState(false);
-
-  const toggleEmailEditable = () => {
-    setEmailEditable(!emailEditable);
-  };
-
-  const toggleMobileEditable = () => {
-    setMobileEditable(!mobileEditable);
-  };
-
-  const saveEmail = () => {
-    setEmailSavedNotification(true);
-    setTimeout(() => {
-      setEmailSavedNotification(false);
-    }, 3000);
-  };
-
-  const saveMobile = () => {
-    setMobileSavedNotification(true);
-    setTimeout(() => {
-      setMobileSavedNotification(false);
-    }, 3000);
-  };
-
   // =================================
   const [sellerInfo, setSellerInfo] = useState(null);
   const [isLoadingSellerInfo, setIsLoadingSellerInfo] = useState(true);
@@ -177,7 +153,7 @@ const SellerAccount = () => {
       {sellerInfo ? (
         <div className="pt-3 ">
           {/* Main Content */}
-          <div className="overflow-hidden rounded-xl  sm:px-8 ">
+          <div className="overflow-hidden rounded-xl  sm:px-8 mb-5">
             {/* Account settings section */}
             {/* <div className="pt-4">
             <h1 className="py-2 text-2xl font-semibold">Account settings</h1>
@@ -374,8 +350,56 @@ const SellerAccount = () => {
                 </button>
               </form>
             ) : (
-              "Pickup location added"
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                {/* <ProfileItem
+                  label="Mobile Number"
+                  value={sellerData.mobile_number}
+                /> */}
+                <ProfileItem
+                  label="Company Name"
+                  value={sellerInfo.company_name}
+                />
+                <ProfileItem
+                  label="Pickup Location Nick Name"
+                  value={sellerInfo.pickup_location}
+                />
+                <ProfileItem
+                  label="Pickup Location Id"
+                  value={sellerInfo.pickup_id}
+                />
+                <ProfileItem
+                  label="Pickup Location RTO Address Id"
+                  value={sellerInfo.rto_address_id}
+                />
+                <ProfileItem
+                  label="Address"
+                  value={sellerInfo.sellerPickupLocation[0].address}
+                />
+                {sellerInfo.sellerPickupLocation[0].address_2 && (
+                  <ProfileItem
+                    label="Address 2"
+                    value={sellerInfo.sellerPickupLocation[0].address_2}
+                  />
+                )}
+                <ProfileItem
+                  label="State"
+                  value={sellerInfo.sellerPickupLocation[0].state}
+                />
+                <ProfileItem
+                  label="City"
+                  value={sellerInfo.sellerPickupLocation[0].city}
+                />
+                <ProfileItem
+                  label="Country"
+                  value={sellerInfo.sellerPickupLocation[0].country}
+                />
+                <ProfileItem
+                  label="Pincode"
+                  value={sellerInfo.sellerPickupLocation[0].pin_code}
+                />
+              </div>
             )}
+            <hr className="mt-4 mb-4" />
 
             {/* Date of Birth */}
             {/* <p className="py-2 text-xl font-semibold text-left">Date of Birth</p>

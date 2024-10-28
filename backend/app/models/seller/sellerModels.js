@@ -111,6 +111,15 @@ const sellerSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+
+    is_aadhaar_card_added: {
+        type: Boolean,
+        default: false,
+    },
+    is_pan_card_added: {
+        type: Boolean,
+        default: false,
+    },
 }, { timestamps: true, });
 
 // generating jwt token
